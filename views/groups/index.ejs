@@ -45,34 +45,38 @@
           </ul>
           <div class="tab-content " id="myTabContent">
             <div class="tab-pane fade active in" id="home" role="tabpanel" aria-labelledby="home-tab">
-              <form action="/groups/create" method="POST">
-                <div class="form-group">
-                  <label for="gNum">Номер группы</label>
-                  <select id="inputState" class="form-control">
-                      <option selected>Choose...</option>
-                    </select>
-                </div>
-                <table class="table" id="table">
+              <%- include('groupAddTab.ejs') %>
+            </div>
+            <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="groups-list-tab">
+              <!--<form>
+                <table class="table form-group" id="table">
                   <thead>
                     <tr>
-                      <th scope="col">#</th>
-                      <th scope="col">Имя</th>
-                      <th scope="col">Фамилия</th>
-                      <th scope="col">Username</th>
-                      <th scope="col">Действия</th>
+                      <th scope="col">1</th>
+                      <th scope="col">2</th>
+                      <th scope="col">3</th>
+                      <th scope="col">4</th>  
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
                       <th scope="row">1</th>
-                      <td>Mark</td>
+                      <td>
+                        <button type="button" class="btn btn-light" data-container="body" data-toggle="popover" data-trigger="focus" data-placement="top" data-html="true"  data-content='<%- include('pop.ejs')%>'>
+                        Popover on top
+                        </button>
+                      </td>
                       <td>Otto</td>
                       <td>@mdo</td>
                       <td><span class="btn btn-danger minus pull-center">&ndash;</span></td>
                     </tr>
                     <tr>
                       <th scope="row">2</th>
-                      <td>Jacob</td>
+                      <td>
+                        <button type="button" class="btn btn-light" data-container="body" data-toggle="popover" data-placement="top" data-html="true"  data-content='<%- include('pop.ejs')%>'>
+                          Popover on top
+                        </button>
+                      </td>
                       <td>Thornton</td>
                       <td>@fat</td>
                       <td><span class="btn btn-danger minus pull-center">&ndash;</span></td>
@@ -86,28 +90,24 @@
                     </tr>
                   </tbody>
                 </table>
-                <form>
-                  <div class="form-row">
-                    <div class="form-group col-md-6">
-                      <label for="name">Name</label>
-                      <input type="text" class="form-control" id="name" placeholder="Name">
-                    </div>
-                    <div class="form-group col-md-6">
-                      <label for="surname">Surname</label>
-                      <input type="text" class="form-control" id="surname" placeholder="Surname">
-                    </div>
+                <div class="form-group">
+                  <label for="gNum">Курс</label>
+                  <select id="gNum" class="form-control">
+                      <option selected>1</option>
+                      <option >2</option>
+                      <option >3</option>
+                      <option >4</option>
+                  </select> 
+                </div>
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <label for="name">Номер группы</label>
+                    <input type="text" class="form-control" id="name" placeholder="Name">
                   </div>
-                  <div class="form-group">
-                    <label for="studentID">Номер студенческого билета</label>
-                    <input type="text" class="form-control" id="studentID" placeholder="123456">
-                  </div>
-                  <button type="button" class="btn btn-success plus pull-right">Add..</button>
-                  <button type="submit" class="btn send-json btn-primary">Submit</button>
-                </form>
-              </form>
-            </div>
-            <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="groups-list-tab">
-              <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magni maiores blanditiis error, amet vel, fugit molestias eaque incidunt nobis, voluptatem dicta quam perferendis. Velit, dolore, non tenetur sapiente itaque iste maiores, fugit placeat labore dolores ipsam quasi corrupti nemo beatae laudantium impedit laborum temporibus! Vitae ipsa, distinctio dolore, libero reiciendis incidunt labore sint ipsam. Dolorum perspiciatis voluptate, sequi est autem eveniet, expedita commodi maiores voluptatum necessitatibus. Optio in, dicta minima ut nisi neque, consequuntur illum suscipit repellendus expedita unde veritatis, eos harum quod sequi. Rem repudiandae earum a magni distinctio porro, ipsum impedit. Fuga dolorum possimus laboriosam exercitationem ipsum, alias quis quaerat omnis cupiditate quae eum non dolorem earum. Dignissimos commodi id fuga assumenda quae corporis consequatur pariatur quas ab, quod, accusamus maiores fugit! Quasi ad excepturi explicabo veritatis iusto deleniti reiciendis repellendus, odit esse totam vero qui magni quos nobis, aut minima molestias unde facilis non architecto accusantium voluptate quam culpa error soluta. Quod ratione consequatur atque voluptas rerum laudantium, deleniti molestiae nisi repellat dignissimos culpa distinctio. Aspernatur repellendus odio rem molestiae veritatis in, ipsam modi sit voluptas at consequatur error corporis id incidunt. Itaque hic iste, quam, cupiditate dignissimos facilis nostrum consequatur sunt accusamus eos, ducimus perferendis commodi.</p>
+                </div>
+                <button type="button" class="btn btn-success plus pull-right">Add..</button>
+                <button type="button" class="btn send-json btn-primary">Submit</button>
+                </form>-->
             </div>
             <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">...</div>
         </div>
@@ -119,9 +119,93 @@
         </footer>
     </div>
     <script>
+      var $ = jQuery.noConflict();
+      var groups;
       // формируем новые поля
       $('.plus').click(function(){
+        let lastNumber;
+        if($('#table tbody tr').length == 0) lastNumber = 0;
+        else lastNumber = parseInt($('#table').find('tbody').find('th').last().text())+1;
+        $('.table').append(
+          '<tr>' +
+            '<th>'+ lastNumber +'</th>' +
+            '<td>'+$("#name").val()+'</td>' +
+            '<td>'+$("#surname").val()+'</td>' +
+            '<td>'+$("#studentID").val()+'</td>' +
+            '<td><span class="btn btn-danger minus pull-center">&ndash;</span></td>' +
+          '</tr>'
+          );
+          $("#name").val('');
+          $("#surname").val('');
+          $("#studentID").val('');
+      });
+
+      $(document).ready(function(){
+        $.get( "/groups/list", function( data, err ) {
+          groups = data;
+          data.forEach(function(item, i){
+            $('#gNum').append('<option>'+item.gNum+'</option>');
+          });
+        });
+      });
+
+      $('#gNum').change(function(){
+        $("#table tbody tr").remove();
+        let table;
+        let lastNumber = 0;
+        groups.find(function(item, i){
+          if(item.gNum==$('#gNum').val()) table = JSON.parse(item.content);
+        });
+        table.forEach(function(item){
+          $('.table').append(
+          '<tr>' +
+            '<th>'+ lastNumber++ +'</th>' +
+            '<td>'+item.name+'</td>' +
+            '<td>'+item.surname+'</td>' +
+            '<td>'+item.studentID+'</td>' +
+            '<td><span class="btn btn-danger minus pull-center">&ndash;</span></td>' +
+          '</tr>'
+          );
+        });
+      });
+
+      // on - так как элемент динамически создан и обычный обработчик с ним не работает
+      $(document).on('click', '.minus', function(){
+        $( this ).closest( 'tr' ).remove(); // удаление строки с полями
+      });
+      $(document).on('click', '.btn-secondary', function(){
+        alert('lol'); // удаление строки с полями
+      });
+
+      $(function () {
+        $('[data-toggle="popover"]').popover();
+        $('.popover-dismiss').popover({
+          trigger: 'focus'
+        });
+      });
+      
+      $('.send-json').click(function(){
+        var content = [];
+        $("#table tbody tr").each(function(){
+              content.push({
+                name:this.cells[1].innerText,
+                surname:this.cells[2].innerText,
+                studentID:this.cells[3].innerText,
+              });
+          });
+         $.get("/csrfToken", function (data, jwres) {
+            if (jwres != 'success') { return false; }
+            msg = {
+              some_data: {gNum:$("#gNum").val(), content:JSON.stringify(content)},
+              _csrf: data._csrf
+            };
+            $.post("/groups/create", msg, function(data, status){});
+          });
+      });
+
+      function addRow() {
         let lastNumber = parseInt($('#table').find('tbody').find('th').last().text())+1;
+        
         $('.table').append(
         '<tr>' +
           '<th>'+ lastNumber +'</th>' +
@@ -134,12 +218,5 @@
         $("#name").val('');
         $("#surname").val('');
         $("#studentID").val('');
-      });
-      // on - так как элемент динамически создан и обычный обработчик с ним не работает
-      $(document).on('click', '.minus', function(){
-        $( this ).closest( 'tr' ).remove(); // удаление строки с полями
-      });
-      /*$('.send-json').click(function(){
-        $.post( "/groups/create", { gNum: "John", content: "ghfgf" } );
-      });*/
-  </script>
+      }
+</script>

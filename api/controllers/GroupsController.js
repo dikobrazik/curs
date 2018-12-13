@@ -8,18 +8,26 @@
 module.exports = {
     create: function (req, res) {
         var elem = {
-            gNum : req.param('gNum'),
-            content : req.param('content'),
+            gNum : req.param('some_data').gNum,
+            content : req.param('some_data').content,
         };
         Groups.create(elem).exec(function (err, groups) {
-            console.log(err);
-            if (err) return res.sendStatus(500);
+            if (err) {
+                console.log(err);
+                return res.sendStatus(500);
+            }
+            return res.ok();
+            
         });
         //res.redirect('/');
     },
 
     list: function(req,res){
-
+        Groups.find()
+            .exec(function (err, groups) {
+                return res.send(groups);
+                if (err) return res.send(500);
+            });
     },
 
     // @MAIN

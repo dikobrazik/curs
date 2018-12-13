@@ -29,6 +29,8 @@ module.exports.routes = {
 
   '/groups'    : 'GroupsController.index',
 
+  'GET /csrfToken': { action: 'security/grant-csrf-token' },
+  
   '/logout'   : {
     controller: 'session',
     action: 'destroy'
