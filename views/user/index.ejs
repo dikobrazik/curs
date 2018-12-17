@@ -1,21 +1,155 @@
 <div class="container">
-    <div class="row">
-        <div class="col-md-4"></div>
-        <div class="col-md-4">
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    <form action="/user/create" method="POST">
-                        <input type="text" name="username" placeholder="Имя Пользователя"><br>
-                        <input type="password" name="password" placeholder="Пароль"><br>
-                        <input type="hidden" name="_csrf" value="<%= _csrf %>">
-                        <!-- Поле которое можно удалить после создания администратора -->
-                        <input type="hidden" name="admin" value="true">
-                        
-                        <input type="submit" class="btn btn-success btn-block" value="Зарегистрироваться">
-                    </form>
-                </div>
+        <nav class="navbar navbar-expand-md d-flex justify-content-end sticky-top mt-4 navbar-dark bg-dark">
+            <img src="https://www.michigan.gov/images/som/SOMicon_Education_521974_7.png" alt="logo" class="navbar-brand" width="70px" height="70px">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="true" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse col-md-6 m-auto" id="navbarSupportedContent">
+                 <ul class="navbar-nav visible-xs">
+                  <li class="nav-item col-md-auto"><a href="#" class="nav-link bg-transparent"><h3>Список групп</h3></a></li>
+                  <li class="nav-item col-md-auto"><a href="#" class="nav-link bg-transparent"><h3>Расписание</h3></a></li>
+                  <li class="nav-item col-md-auto"><a href="#" class="nav-link bg-transparent"><h3>Управление аккаунтами</h3></a></li>
+                  <li class="nav-item col-md-auto border border-light"><a href="/session" class="nav-link bg-transparent"><h3>Другое?</h3></a></li>
+                 </ul>
             </div>
+        </nav>
+        <nav class="navbar col-sm-3 hidden-xs sticky-top p-auto mt-4 navbar-dark bg-dark">
+          <ul class="nav flex-column">
+            <li class="nav-item"><a href="/groups" class="nav-link">
+                Список групп
+              </a></li>
+            <li class="nav-item"><a href="#" class="nav-link">
+                Расписание
+              </a></li>
+            <li class="nav-item"><a href="#" class="nav-link">
+                Управление аккаунтами
+              </a></li>
+            <li class="nav-item"><a href="#" class="nav-link">
+                Другое?
+              </a></li>
+          </ul>
+        </nav>
+
+        <div class="col-sm-8 mr-1 mt-4 pb-2 pull-right bg-light border border-primary">
+          <%- include('groupAddTab.ejs') %>
         </div>
-        <div class="col-md-4"></div>
+        <footer class="footer fixed-bottom bg-dark">
+              <div class="container">
+                  <span class="text-muted">Place sticky footer content here.</span>
+              </div>
+        </footer>
     </div>
-</div>
+    <script>
+      var $ = jQuery.noConflict();
+      //обновление при открытии
+      $(document).ready(refresh());
+      /*
+      * функция обновления
+      * Очищает таблицу
+      * загружает список с сервера
+      * вносит данные в таблицу
+      */
+      function refresh(){
+        $('.table').hide();
+        $("#table tbody tr").remove();
+        let tbody;
+        let lastNumber = 0;
+        $.get( "/user/list", function( data, err ) {
+            data.forEach(function(item){
+                tbody = tbody + '<tr>' +
+                '<th>'+ lastNumber++ +'</th>' +
+                '<td>'+item.name+'</td>' +
+                '<td>'+item.surname+'</td>' +
+                '<td>'+item.username+'</td>' +
+                '<td><span class="btn btn-secondary edit pull-center"><i class="fas fa-edit"></i></span><span class="btn btn-danger minus pull-center"><i class="fas fa-trash-alt"></i></span></td>' +
+              '</tr>';
+              
+            });
+            $('.table').append(tbody);
+        });
+        $('.table').fadeIn(10);
+        $("#name").val('');
+        $("#surname").val('');
+        $("#username").val('');
+        $("#password").val('');
+      };
+      // on - так как элемент динамически создан и обычный обработчик с ним не работает
+      $(document).on('click', '.minus', function(){
+        let name = $(this).parent().parent().find('td:eq(0)').html();
+        let surname = $(this).parent().parent().find('td:eq(1)').html();
+        let username = $(this).parent().parent().find('td:eq(2)').html();
+        $.get("/csrfToken", function (data, jwres) {
+            if (jwres != 'success') { return false; }
+            msg = {
+              data: 
+                {name:name,
+                surname:surname,
+                username:username,
+                },
+              _csrf: data._csrf
+            };
+            $.post("/user/delete", msg, function(data, status){
+                if(status=='success'){
+                    refresh();
+                }else{
+                    alert(status);
+                }
+            });
+        });
+      });
+      $(document).on('click', '.edit', function(){
+        let name = $(this).parent().parent().find('td:eq(0)').html();
+        let surname = $(this).parent().parent().find('td:eq(1)').html();
+        let username = $(this).parent().parent().find('td:eq(2)').html();
+        $("#name").val(name);
+        $("#surname").val(surname);
+        $("#username").val(username);
+      });
+      $('.sumbit').click(function(){
+        $.get("/csrfToken", function (data, jwres) {
+            if (jwres != 'success') { return false; }
+            msg = {
+                data: 
+                    {name:name,
+                    surname:surname,
+                    username:username,
+                    },
+                ndata: 
+                    {name:name,
+                    surname:surname,
+                    username:username,
+                    password:password,
+                    },
+                _csrf: 
+                    data._csrf
+            };
+            $.post("/user/update", msg, function(data, status){
+                if(status=='success'){
+                    refresh();
+                }else{
+                    alert(status);
+                }
+            });
+        });
+      });
+      $('.plus').click(function(){
+         $.get("/csrfToken", function (data, jwres) {
+            if (jwres != 'success') { return false; }
+            msg = {
+              data: 
+                {name:$('#name').val(),
+                surname:$('#surname').val(),
+                username:$('#username').val(),
+                password:$('#password').val()},
+              _csrf: data._csrf
+            };
+            $.post("/user/create", msg, function(data, status){
+                if(status=='success'){
+                    refresh();
+                }else{
+                    alert(status);
+                }
+            });
+          });
+      });
+</script>

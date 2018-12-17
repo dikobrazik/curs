@@ -1,8 +1,19 @@
 <form>
-<div class="form-group">
+  <div class="form-check form-check-inline mt-3">
+    <input class="form-check-input ml-1" type="radio" name="radio" id="createGroup" value="option1" >
+    <label class="form-check-label ml-4" for="createGroup">
+      Создание новой группы
+    </label>
+    <input class="form-check-input ml-4" type="radio" name="radio" id="upgradeGroup" value="option2" checked>
+    <label class="form-check-label  ml-4" for="upgradeGroup">
+      Изменение группы
+    </label>
+  </div>
+<div class="form-group mt-2">
   <label for="gNum">Номер группы</label>
   <select id="gNum" class="form-control">
   </select>
+  <input type="text" class="form-control hide" id="gNumInput" placeholder="4321">
 </div>
 <table class="table form-group" id="table">
   <thead>

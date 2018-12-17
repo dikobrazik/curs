@@ -23,7 +23,7 @@ module.exports.routes = {
 
   '/create': { view: 'post/create' },
 
-  '/register' : 'UserController.index',
+  '/user' : 'UserController.index',
 
   '/login'    : 'SessionController.index',
 
@@ -55,6 +55,15 @@ module.exports.routes = {
     controller: 'user',
     action: 'create'
   },
+  'post /user/delete': {
+    controller: 'user',
+    action: 'delete'
+  },
+  'post /user/update': {
+    controller: 'user',
+    action: 'update'
+  },
+
 
   'post /post/create': {
     controller: 'post',

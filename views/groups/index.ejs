@@ -7,22 +7,22 @@
             </button>
             <div class="collapse navbar-collapse col-md-6 m-auto" id="navbarSupportedContent">
                  <ul class="navbar-nav visible-xs">
-                  <li class="nav-item col-md-auto"><a href="#" class="nav-link bg-transparent"><h3>Список групп</h3></a></li>
+                  <li class="nav-item col-md-auto"><a href="/" class="nav-link bg-transparent"><h3>Список групп</h3></a></li>
                   <li class="nav-item col-md-auto"><a href="#" class="nav-link bg-transparent"><h3>Расписание</h3></a></li>
-                  <li class="nav-item col-md-auto"><a href="#" class="nav-link bg-transparent"><h3>Управление аккаунтами</h3></a></li>
+                  <li class="nav-item col-md-auto"><a href="/user" class="nav-link bg-transparent"><h3>Управление аккаунтами</h3></a></li>
                   <li class="nav-item col-md-auto border border-light"><a href="/session" class="nav-link bg-transparent"><h3>Другое?</h3></a></li>
                  </ul>
             </div>
         </nav>
         <nav class="navbar col-sm-3 hidden-xs sticky-top p-auto mt-4 navbar-dark bg-dark">
           <ul class="nav flex-column">
-            <li class="nav-item"><a href="#" class="nav-link">
+            <li class="nav-item"><a href="/" class="nav-link">
                 Список групп
               </a></li>
             <li class="nav-item"><a href="#" class="nav-link">
                 Расписание
               </a></li>
-            <li class="nav-item"><a href="#" class="nav-link">
+            <li class="nav-item"><a href="/user" class="nav-link">
                 Управление аккаунтами
               </a></li>
             <li class="nav-item"><a href="#" class="nav-link">
@@ -32,7 +32,8 @@
         </nav>
 
         <div class="col-sm-8 mr-1 mt-4 pb-2 pull-right bg-light border border-primary">
-          <ul class="nav nav-tabs border-bottom border-primary" id="myTab" role="tablist">
+          <%- include('groupAddTab.ejs') %>
+          <!--<ul class="nav nav-tabs border-bottom border-primary" id="myTab" role="tablist">
             <li class="nav-item active">
               <a class="nav-link" id="create-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Создание группы</a>
             </li>
@@ -43,12 +44,13 @@
               <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">Contact</a>
             </li>
           </ul>
+
           <div class="tab-content " id="myTabContent">
             <div class="tab-pane fade active in" id="home" role="tabpanel" aria-labelledby="home-tab">
               <%- include('groupAddTab.ejs') %>
             </div>
             <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="groups-list-tab">
-              <!--<form>
+              <form>
                 <table class="table form-group" id="table">
                   <thead>
                     <tr>
@@ -107,10 +109,10 @@
                 </div>
                 <button type="button" class="btn btn-success plus pull-right">Add..</button>
                 <button type="button" class="btn send-json btn-primary">Submit</button>
-                </form>-->
+                </form>
             </div>
             <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">...</div>
-        </div>
+        </div>-->
         </div>
         <footer class="footer fixed-bottom bg-dark">
               <div class="container">
@@ -168,7 +170,14 @@
           );
         });
       });
-
+      $("#createGroup").change(function(){
+        $('#gNumInput').removeClass('hide');
+        $('#gNum').addClass('hide');
+      });
+      $("#upgradeGroup").change(function(){
+        $('#gNum').removeClass('hide');
+        $('#gNumInput').addClass('hide');
+      });
       // on - так как элемент динамически создан и обычный обработчик с ним не работает
       $(document).on('click', '.minus', function(){
         $( this ).closest( 'tr' ).remove(); // удаление строки с полями
@@ -202,21 +211,4 @@
             $.post("/groups/create", msg, function(data, status){});
           });
       });
-
-      function addRow() {
-        let lastNumber = parseInt($('#table').find('tbody').find('th').last().text())+1;
-        
-        $('.table').append(
-        '<tr>' +
-          '<th>'+ lastNumber +'</th>' +
-          '<td>'+$("#name").val()+'</td>' +
-          '<td>'+$("#surname").val()+'</td>' +
-          '<td>'+$("#studentID").val()+'</td>' +
-          '<td><span class="btn btn-danger minus pull-center">&ndash;</span></td>' +
-        '</tr>'
-        );
-        $("#name").val('');
-        $("#surname").val('');
-        $("#studentID").val('');
-      }
 </script>

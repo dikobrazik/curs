@@ -11,6 +11,8 @@ var User = {
   attributes: {
 
     id: {type: 'number', autoIncrement: true,},
+    name: {type: 'string', required: true,},
+    surname: {type: 'string', required: true,},
     username: {type: 'string', required: true, unique: true},
     password: {type: 'string', required: true, minLength: 5},
     admin: {type: 'boolean',defaultsTo: false},
