@@ -18,7 +18,8 @@ module.exports = {
         };
         User.find({username:username}).exec(function (err, user) {
             if (!user || err) return res.sendStatus(500);
-            var hash = crypto.createHash('sha256', password);
+            var hash = crypto.createHash('sha256');
+            hash.update(password);
             var hHash = hash.digest('hex');
             if (hHash == user[0].password) {
                 req.session.auth = true;

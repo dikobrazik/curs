@@ -23,8 +23,13 @@ var User = {
     },
 
   beforeCreate: function (values, next) {
-    // Создаем зашифрованную запись пароля в БД
-    var mainPass = crypto.createHash('sha256', values.password);
+    /*User
+      .find({username: values.username})
+      .exec(function (err, record) {
+        if(!err && !record) next(err);
+    });*/
+    var mainPass = crypto.createHash('sha256');
+    mainPass.update(values.password);
     values.password = mainPass.digest('hex');
     next();     
   }

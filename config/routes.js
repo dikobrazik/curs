@@ -29,6 +29,8 @@ module.exports.routes = {
 
   '/groups'    : 'GroupsController.index',
 
+  '/edu'    : 'EducationController.index',
+
   'GET /csrfToken': { action: 'security/grant-csrf-token' },
   
   '/logout'   : {

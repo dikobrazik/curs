@@ -1,8 +1,59 @@
 <div class="container">
         <%- include('../layouts/nav.ejs') %>
-
         <div class="col-sm-8 mr-1 mt-4 pb-2 pull-right bg-light border border-primary">
-          <%- include('userAddBlock.ejs') %>
+          <!--<%- include('lessonAddBlock.ejs') %>-->
+          <div class="row">
+            <!-- <table class="table form-group col m-2" id="table">
+            <thead>
+              <tr>
+                <th  class="float-center" scope="col">Понедельник</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="d-flex justify-content-center border-bottom">
+                <td>1</td>
+              </tr>
+              <tr class="d-flex justify-content-center border-bottom">
+                <td>2</td>
+              </tr>
+              <tr class="d-flex justify-content-center border-bottom">
+                <td>3</td>
+              </tr>
+              <tr class="d-flex justify-content-center border-bottom">
+                <td>4</td>
+              </tr>
+              <tr class="d-flex justify-content-center">
+                <td>5</td>
+              </tr>
+            </tbody>
+          </table> 
+          <table class="table form-group col" id="table">
+            <thead>
+              <tr>
+                <th scope="col">Вторник</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="d-flex justify-content-center">
+                <td>1</td>
+              </tr>
+              <tr class="d-flex justify-content-center">
+                <td>2</td>
+              </tr>
+              <tr class="d-flex justify-content-center">
+                <td>3</td>
+              </tr>
+              <tr class="d-flex justify-content-center">
+                <td>4</td>
+              </tr>
+              <tr class="d-flex justify-content-center">
+                <td>5</td>
+              </tr>
+            </tbody>
+          </table>-->
+          </div>
+          <div class="row">
+          </div>
         </div>
         <footer class="footer fixed-bottom bg-dark">
               <div class="container">
@@ -13,8 +64,25 @@
     <script>
       var $ = jQuery.noConflict();
       var trdata = [];
+      var week = ['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
       //обновление при открытии
-      $(document).ready(refresh());
+      $(document).ready(function(){
+        week.forEach(function(item, i){
+          if(i<3){
+            $('.row:eq(0)').append('<table class="table form-group col m-2" id="table"><thead><tr><th  class="float-center" scope="col">'+item+'</th></tr></thead><tbody>'+tds()+'</tbody></table>')
+          }
+          else{
+            $('.row:eq(1)').append('<table class="table form-group col m-2" id="table"><thead><tr><th  class="float-center" scope="col">'+item+'</th></tr></thead><tbody>'+tds()+'</tbody></table>')
+          }
+        });
+      });
+      function tds(){
+        var tds = '';
+        for(let i=0; i < 6; i++){
+          tds+='<tr class="d-flex justify-content-center"><button type="button" class="btn btn-primary">'+i+'</button></tr>';
+        }
+        return tds;
+      };
       /*
       * функция обновления
       * Очищает таблицу
@@ -110,34 +178,7 @@
             });
         });
       });
-      /*$('.sumbit').click(function(){
-        alert('l');
-        $.get("/csrfToken", function (data, jwres) {
-            if (jwres != 'success') { return false; }
-            msg = {
-                data: 
-                    {name:name,
-                    surname:surname,
-                    username:username,
-                    },
-                ndata: 
-                    {name:name,
-                    surname:surname,
-                    username:username,
-                    password:password,
-                    },
-                _csrf: 
-                    data._csrf
-            };
-            $.post("/user/update", msg, function(data, status){
-                if(status=='success'){
-                    refresh();
-                }else{
-                    alert(status);
-                }
-            });
-        });
-      });*/
+
       $('.plus').click(function(){
          $.get("/csrfToken", function (data, jwres) {
             if (jwres != 'success') { return false; }
