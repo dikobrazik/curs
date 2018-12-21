@@ -1,60 +1,33 @@
 <div class="container">
+
         <%- include('../layouts/nav.ejs') %>
-        <div class="col-sm-8 mr-1 mt-4 pb-2 pull-right bg-light border border-primary">
+        <div class="col-md-8 d-inline-block mr-1 mt-4 pb-2 float-right bg-light border border-primary">
           <!--<%- include('lessonAddBlock.ejs') %>-->
           <div class="row">
-            <!-- <table class="table form-group col m-2" id="table">
-            <thead>
-              <tr>
-                <th  class="float-center" scope="col">Понедельник</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="d-flex justify-content-center border-bottom">
-                <td>1</td>
-              </tr>
-              <tr class="d-flex justify-content-center border-bottom">
-                <td>2</td>
-              </tr>
-              <tr class="d-flex justify-content-center border-bottom">
-                <td>3</td>
-              </tr>
-              <tr class="d-flex justify-content-center border-bottom">
-                <td>4</td>
-              </tr>
-              <tr class="d-flex justify-content-center">
-                <td>5</td>
-              </tr>
-            </tbody>
-          </table> 
-          <table class="table form-group col" id="table">
-            <thead>
-              <tr>
-                <th scope="col">Вторник</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="d-flex justify-content-center">
-                <td>1</td>
-              </tr>
-              <tr class="d-flex justify-content-center">
-                <td>2</td>
-              </tr>
-              <tr class="d-flex justify-content-center">
-                <td>3</td>
-              </tr>
-              <tr class="d-flex justify-content-center">
-                <td>4</td>
-              </tr>
-              <tr class="d-flex justify-content-center">
-                <td>5</td>
-              </tr>
-            </tbody>
-          </table>-->
           </div>
           <div class="row">
           </div>
-        </div>
+            <!-- Modal -->
+            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         <footer class="footer fixed-bottom bg-dark">
               <div class="container">
                   <span class="text-muted">Place sticky footer content here.</span>
@@ -65,21 +38,31 @@
       var $ = jQuery.noConflict();
       var trdata = [];
       var week = ['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
+
+      $(document).on('click', 'button[data-toggle="modal"]', function (event) {
+        var button = $(event.target);
+        //table name
+        $('.modal-title').text(button.parents('#table').find('thead tr th').text());
+        //row index
+        console.log(button.parents('tr')["0"].rowIndex);
+      });
+
       //обновление при открытии
       $(document).ready(function(){
         week.forEach(function(item, i){
           if(i<3){
-            $('.row:eq(0)').append('<table class="table form-group col m-2" id="table"><thead><tr><th  class="float-center" scope="col">'+item+'</th></tr></thead><tbody>'+tds()+'</tbody></table>')
+            $('div.row:eq(0)').append('<table class="table form-group col m-2" id="table"><thead><tr><th  class="float-center" scope="col">'+item+'</th></tr></thead><tbody>'+tds()+'</tbody></table>')
           }
           else{
-            $('.row:eq(1)').append('<table class="table form-group col m-2" id="table"><thead><tr><th  class="float-center" scope="col">'+item+'</th></tr></thead><tbody>'+tds()+'</tbody></table>')
+            $('div.row:eq(1)').append('<table class="table form-group col m-2" id="table"><thead><tr><th  class="float-center" scope="col">'+item+'</th></tr></thead><tbody>'+tds()+'</tbody></table>')
           }
+
         });
       });
       function tds(){
         var tds = '';
         for(let i=0; i < 6; i++){
-          tds+='<tr class="d-flex justify-content-center"><button type="button" class="btn btn-primary">'+i+'</button></tr>';
+          tds+='<tr class="d-flex justify-content-center"><td class="col p-0"><button type="button" class="col btn btn-success" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-plus"></i></button><td></tr>';
         }
         return tds;
       };

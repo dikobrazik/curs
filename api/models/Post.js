@@ -20,10 +20,6 @@ module.exports = {
           type: 'string',
           required: true
       },
-      id: { 
-          type: 'number', 
-          autoIncrement: true, 
-      },
   
     },
 
