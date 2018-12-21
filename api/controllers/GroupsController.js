@@ -25,7 +25,9 @@ module.exports = {
     list: function(req,res){
         Groups.find()
             .exec(function (err, groups) {
-                return res.send(groups);
+                return res.send(groups.map((item)=>{
+                    return item.gNum
+                }));
                 if (err) return res.send(500);
             });
     },

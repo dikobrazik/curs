@@ -3,6 +3,8 @@
         <%- include('../layouts/nav.ejs') %>
         <div class="col-md-8 d-inline-block mr-1 mt-4 pb-2 float-right bg-light border border-primary">
           <!--<%- include('lessonAddBlock.ejs') %>-->
+          <select class="form-control mt-2 groupSelect" id="groupSelect">
+          </select>
           <div class="row">
           </div>
           <div class="row">
@@ -18,11 +20,13 @@
                     </button>
                   </div>
                   <div class="modal-body">
-                    
+                    <select class="form-control" id="userSelect">
+                      
+                    </select>
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
+                    <button type="button" class="btn btn-primary modal-save">Save changes</button>
                   </div>
                 </div>
               </div>
@@ -37,35 +41,97 @@
     <script>
       var $ = jQuery.noConflict();
       var trdata = [];
+      var cellIndex;
+      var rowIndex;
       var week = ['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
+      var tab = [];
+      $(document).ready(function(){
+          $.get("/user/list", function (data) {
+            data.forEach(function(item){
+              $('#userSelect').append('<option>'+item.name + ' ' + item.surname+'</option>');
+            });
+          });
+          $.get("/groups/list", function (data) {
+            tablesInit(data[0]);
+            data.forEach(function(item){
+              $('#groupSelect').append('<option>'+item +'</option>');
+            });
+          });
+      });
+      /*
+      *    Обработка кнопки SAVE модального окна
+      */
+      $('.modal-save').click(function(){
+        let element = document.getElementsByTagName('table')[week.indexOf(cellIndex)].getElementsByTagName('tbody')[0].getElementsByTagName('td')[rowIndex-1];
+        let height = element.offsetHeight;
+        element.innerHTML = '<h4>'+document.getElementById('userSelect').value+'</h4>';
+        element.style.height = height + 'px';
+       // $('#table').find('thead tr th').text('lol');
+        $('#exampleModal').modal('hide');
+        if(!tab[week.indexOf(cellIndex)]){
+          tab[week.indexOf(cellIndex)] = [];
+        }
+        tab[week.indexOf(cellIndex)].push(
+          {username:element.textContent, tabindex:week.indexOf(cellIndex), rowindex:rowIndex-1}
+        );
+        tabSort();
+        update();
+        /*$(document).on('hidden.bs.modal', '#exampleModal', function(e){
+            console.log(document.getElementsByTagName('table'));
+        });*/
+      });
 
+      /*
+      *   Сортировка JSON
+      */
+      function tabSort(){
+        tab.forEach(function(item){
+          item.sort(function (a, b) {
+            if (a.rowindex > b.rowindex) {
+              return 1;
+            }
+            if (a.rowindex < b.rowindex) {
+              return -1;
+            }
+            // a должно быть равным b
+            return 0;
+          });
+        });
+      }
+      /*
+      *   UPDATE TABLE ROW
+      */
+      function update(){
+        $.get("/csrfToken", function (data, jwres) {
+            if (jwres != 'success') { return false; }
+            msg = {
+              data: 
+                {gNum:document.getElementById('groupSelect').value,
+                content:JSON.stringify(tab),
+                },
+              _csrf: data._csrf
+            };
+            $.post("/edu/update", msg, function(data, status){
+                if(status=='success'){
+                  alert(status)
+                }else{
+                  alert(status);
+                }
+            });
+        });
+      }
+      /*
+      *    Обработка кнопки "+" некоторой таблицы
+      */
       $(document).on('click', 'button[data-toggle="modal"]', function (event) {
         var button = $(event.target);
         //table name
-        $('.modal-title').text(button.parents('#table').find('thead tr th').text());
+        cellIndex = button.parents('#table').find('thead tr th').text();
+        $('.modal-title').text(cellIndex);
         //row index
-        console.log(button.parents('tr')["0"].rowIndex);
+        rowIndex = button.parents('tr')["0"].rowIndex;
       });
-
-      //обновление при открытии
-      $(document).ready(function(){
-        week.forEach(function(item, i){
-          if(i<3){
-            $('div.row:eq(0)').append('<table class="table form-group col m-2" id="table"><thead><tr><th  class="float-center" scope="col">'+item+'</th></tr></thead><tbody>'+tds()+'</tbody></table>')
-          }
-          else{
-            $('div.row:eq(1)').append('<table class="table form-group col m-2" id="table"><thead><tr><th  class="float-center" scope="col">'+item+'</th></tr></thead><tbody>'+tds()+'</tbody></table>')
-          }
-
-        });
-      });
-      function tds(){
-        var tds = '';
-        for(let i=0; i < 6; i++){
-          tds+='<tr class="d-flex justify-content-center"><td class="col p-0"><button type="button" class="col btn btn-success" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-plus"></i></button><td></tr>';
-        }
-        return tds;
-      };
+      
       /*
       * функция обновления
       * Очищает таблицу
@@ -96,90 +162,85 @@
         $("#username").val('');
         $("#password").val('');
       };
-      // on - так как элемент динамически создан и обычный обработчик с ним не работает
-      $(document).on('click', '.minus', function(){
-        let name = $(this).parent().parent().find('td:eq(0)').html();
-        let surname = $(this).parent().parent().find('td:eq(1)').html();
-        let username = $(this).parent().parent().find('td:eq(2)').html();
-        $.get("/csrfToken", function (data, jwres) {
-            if (jwres != 'success') { return false; }
-            msg = {
-              data: 
-                {name:name,
-                surname:surname,
-                username:username,
-                },
-              _csrf: data._csrf
-            };
-            $.post("/user/delete", msg, function(data, status){
-                if(status=='success'){
-                    refresh();
-                }else{
-                    alert(status);
-                }
-            });
-        });
-      });
       /*
-      * Добавляет данные в соответствующие поля для изменения
+      *      обновление при открытии
       */
-      $(document).on('click', '.edit', function(){
-        trdata[0] = $(this).parent().parent().find('td:eq(0)').html();
-        trdata[1] = $(this).parent().parent().find('td:eq(1)').html();
-        trdata[2] = $(this).parent().parent().find('td:eq(2)').html();
-        $("#name").val(trdata[0]);
-        $("#surname").val(trdata[1]);
-        $("#username").val(trdata[2]);
-      });
-      /*
-      * Отправляет данные на сервер
-      */
-      $(document).on('click', '.submit', function(){
-        $.get("/csrfToken", function (data, jwres) {
-            if (jwres != 'success') { return false; }
-            msg = {
-                data: 
-                    {name:trdata[0],
-                    surname:trdata[1],
-                    username:trdata[2],
-                    },
-                ndata: 
-                    {name:$("#name").val(),
-                    surname:$("#surname").val(),
-                    username:$("#username").val(),
-                    password:$("#password").val(),
-                    },
-                _csrf: 
-                    data._csrf
-            };
-            $.post("/user/update", msg, function(data, status){
-                if(status=='success'){
-                    refresh();
-                }else{
-                    alert(status);
-                }
-            });
-        });
-      });
+      function tablesInit(i){
+        $.get("/edu/list/1", function (data) {
+          JSON.parse(data).forEach(function(item, i){
+            let row = i<3?0:1;
 
-      $('.plus').click(function(){
-         $.get("/csrfToken", function (data, jwres) {
-            if (jwres != 'success') { return false; }
-            msg = {
-              data: 
-                {name:$('#name').val(),
-                surname:$('#surname').val(),
-                username:$('#username').val(),
-                password:$('#password').val()},
-              _csrf: data._csrf
-            };
-            $.post("/user/create", msg, function(data, status){
-                if(status=='success'){
-                    refresh();
-                }else{
-                    alert(status);
-                }
-            });
+            if(item){
+              $('div.row:eq('+row+')').append(
+              `<table class="table form-group col m-2" id="table">
+                <thead>
+                  <tr>
+                    <th  class="float-center" scope="col">`+week[i]+`</th>
+                  </tr>
+                </thead>
+                <tbody>`+tds(item)+`</tbody>
+              </table>`)
+            }else{
+              $('div.row:eq('+row+')').append(
+              `<table class="table form-group col m-2" id="table">
+                <thead>
+                  <tr>
+                    <th  class="float-center" scope="col">`+week[i]+`</th>
+                  </tr>
+                </thead>
+                <tbody>`+tds()+`</tbody>
+              </table>`)
+            }
           });
-      });
+        });
+      }
+      /*$(document).ready(function(){
+        week.forEach(function(item, i){
+          if(i<3){
+            $('div.row:eq(0)').append(
+              `<table class="table form-group col m-2" id="table">
+                <thead>
+                  <tr>
+                    <th  class="float-center" scope="col">`+item+`</th>
+                  </tr>
+                </thead>
+                <tbody>`+tds()+`</tbody>
+              </table>`)
+          }
+          else{
+            $('div.row:eq(1)').append(`
+              <table class="table form-group col m-2" id="table">
+                <thead>
+                  <tr>
+                    <th  class="float-center" scope="col">`+item+`</th>
+                  </tr>
+                </thead>
+                <tbody>`+tds()+`</tbody>
+              </table>`)
+          }
+        });
+      });*/
+      function tds(item){
+        var tds = '';
+        for(let i=0; i < 6; i++){
+          if(item){
+            if(item[i]) {
+              console.log(item[i].username);
+              tds+=trsPattern(item[0].username);
+            }else tds+=trsPattern();
+          }else tds+=trsPattern();
+          
+        }
+        return tds;
+      };
+      function trsPattern(cont){
+        cont = typeof cont !== 'undefined' ?  '<h4>'+cont+'</h4>' : `<button type="button" class="col btn btn-success" data-toggle="modal" data-target="#exampleModal">
+                <i class="fas fa-plus"></i>
+              </button>`;
+        return `<tr class="d-flex justify-content-center">
+            <td class="col p-0" style="height: 39px;">
+              `+cont+`
+            </td>
+          </tr>`;
+      }
 </script>

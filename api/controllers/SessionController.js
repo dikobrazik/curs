@@ -14,7 +14,7 @@ module.exports = {
             return res.redirect('/login');
         };
         if (req.session.auth) {
-            return res.redirect('/admin');
+            return res.redirect('/groups');
         };
         User.find({username:username}).exec(function (err, user) {
             if (!user || err) return res.sendStatus(500);
@@ -26,7 +26,7 @@ module.exports = {
                 req.session.User = user;
                 console.log(req.session);
                 if (req.session.User[0].admin) {
-                    return res.redirect('/admin');
+                    return res.redirect('/groups');
                 };
             }else{res.redirect('/login');}
         });
@@ -45,7 +45,7 @@ module.exports = {
 
     index: function (req, res) {
         if(req.session.auth){
-            return res.redirect('/admin');
+            return res.redirect('/groups');
         }
         return res.view();
     }

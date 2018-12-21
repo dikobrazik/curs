@@ -21,8 +21,6 @@ module.exports.routes = {
 
   '/': { view: 'pages/homepage' },
 
-  '/create': { view: 'post/create' },
-
   '/user' : 'UserController.index',
 
   '/login'    : 'SessionController.index',
@@ -33,11 +31,36 @@ module.exports.routes = {
 
   'GET /csrfToken': { action: 'security/grant-csrf-token' },
   
+  /*
+  *      /SESSION/....
+  */
+  'post /session/create': {
+    controller: 'session',
+    action: 'create'
+  },
   '/logout'   : {
     controller: 'session',
     action: 'destroy'
   },
+  /*
+  *      /EDUCATION/....
+  */
+  'post /edu/create': {
+    controller: 'education',
+    action: 'create'
+  },
+  'post /edu/update': {
+    controller: 'education',
+    action: 'update'
+  },
+  'get /edu/list/:index': {
+    controller: 'education',
+    action: 'list'
+  },
 
+  /*
+  *      /GROUPS/....
+  */
   'get /groups/list': {
     controller: 'groups',
     action: 'list'
@@ -48,11 +71,9 @@ module.exports.routes = {
     action: 'create'
   },
 
-  'post /session/create': {
-    controller: 'session',
-    action: 'create'
-  },
-
+  /*
+  *      /USER/....
+  */
   'post /user/create': {
     controller: 'user',
     action: 'create'
@@ -65,37 +86,11 @@ module.exports.routes = {
     controller: 'user',
     action: 'update'
   },
-
-
-  'post /post/create': {
-    controller: 'post',
-    action: 'create'
+  'get /user/list': {
+    controller: 'user',
+    action: 'list'
   },
-
-  'get /post/delete/:id': {
-    controller: 'post',
-    action: 'delete'
-  },
-
-  'get /post/clear': {
-    controller: 'post',
-    action: 'clear'
-  },
-
-  'post /post/update': {
-    controller: 'post',
-    action: 'update'
-  },
-
-  'get /post/:page': {
-    controller: 'post', // Контроллер
-    action: 'page' // Действие
-  },
-  'get /post/watch/:id': {
-    controller: 'post', // Контроллер
-    action: 'watch' // Действие
-  },
-
+  
   /***************************************************************************
   *                                                                          *
   * More custom routes here...                                               *

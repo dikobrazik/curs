@@ -13,6 +13,16 @@
 <script>
   var $ = jQuery.noConflict();
   var groups;
+
+  $(document).ready(function(){
+    $.get( "/groups/list", function( data, err ) {
+      groups = data;
+      data.forEach(function(item, i){
+        $('#gNum').append('<option>'+item+'</option>');
+      });
+    });
+  });
+
   // формируем новые поля
   $('.plus').click(function(){
     let lastNumber;
@@ -30,15 +40,6 @@
       $("#name").val('');
       $("#surname").val('');
       $("#studentID").val('');
-  });
-
-  $(document).ready(function(){
-    $.get( "/groups/list", function( data, err ) {
-      groups = data;
-      data.forEach(function(item, i){
-        $('#gNum').append('<option>'+item.gNum+'</option>');
-      });
-    });
   });
 
   $('#gNum').change(function(){
@@ -61,12 +62,12 @@
     });
   });
   $("#createGroup").change(function(){
-    $('#gNumInput').removeClass('hide');
-    $('#gNum').addClass('hide');
+    $('#gNumInput').removeClass('d-none');
+    $('#gNum').addClass('d-none');
   });
   $("#upgradeGroup").change(function(){
-    $('#gNum').removeClass('hide');
-    $('#gNumInput').addClass('hide');
+    $('#gNum').removeClass('d-none');
+    $('#gNumInput').addClass('d-none');
   });
   // on - так как элемент динамически создан и обычный обработчик с ним не работает
   $(document).on('click', '.minus', function(){
