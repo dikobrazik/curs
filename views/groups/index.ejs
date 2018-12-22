@@ -9,6 +9,24 @@
               <span class="text-muted">Place sticky footer content here.</span>
           </div>
     </footer>
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="modal-title" id="exampleModalLabel">Ошибка!</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p><h4>Номер новой группы не может совпадать с номером уже существующей группы</h4></p>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary"  data-dismiss="modal">OK</button>
+          </div>
+        </div>
+      </div>
+    </div>
 </div>
 <script>
   var $ = jQuery.noConflict();
@@ -18,7 +36,7 @@
     $.get( "/groups/list", function( data, err ) {
       groups = data;
       data.forEach(function(item, i){
-        $('#gNum').append('<option>'+item+'</option>');
+        $('#gNum').append('<option>'+item.gNum+'</option>');
       });
     });
   });
@@ -41,7 +59,7 @@
       $("#surname").val('');
       $("#studentID").val('');
   });
-
+  
   $('#gNum').change(function(){
     $("#table tbody tr").remove();
     let table;
@@ -49,7 +67,15 @@
     groups.find(function(item, i){
       if(item.gNum==$('#gNum').val()) table = JSON.parse(item.content);
     });
+    let tableRow = document.createElement('tr');
+    table.appendChild(document.createElement('th'));
+
+    table.appendChild(document.createElement('td'));
+    table.appendChild(document.createElement('td'));
+    table.appendChild(document.createElement('td'));
+
     table.forEach(function(item){
+      
       $('.table').append(
       '<tr>' +
         '<th>'+ lastNumber++ +'</th>' +
@@ -72,9 +98,6 @@
   // on - так как элемент динамически создан и обычный обработчик с ним не работает
   $(document).on('click', '.minus', function(){
     $( this ).closest( 'tr' ).remove(); // удаление строки с полями
-  });
-  $(document).on('click', '.btn-secondary', function(){
-    alert('lol'); // удаление строки с полями
   });
 
   $(function () {
@@ -101,5 +124,11 @@
         };
         $.post("/groups/create", msg, function(data, status){});
       });
+  });
+  document.getElementById('gNumInput').addEventListener("change",function(val){
+    if(groups.indexOf(val.target.value) != -1){
+      val.target.value='';
+      $('#exampleModal').modal('toggle');
+    } 
   });
 </script>

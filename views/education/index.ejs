@@ -68,12 +68,18 @@
         element.style.height = height + 'px';
        // $('#table').find('thead tr th').text('lol');
         $('#exampleModal').modal('hide');
-        if(!tab[week.indexOf(cellIndex)]){
-          tab[week.indexOf(cellIndex)] = [];
+        if(!tab[0]){
+          tab.length = 6;
+          for(var i = 0; i < 6; i++){
+            tab[i] = [];
+            tab[i].length = 6;
+            /*for(var j = 0; j < 6; j++){
+              tab[i][j] = []
+            }*/
+          }
+          //tab[week.indexOf(cellIndex)] = [];
         }
-        tab[week.indexOf(cellIndex)].push(
-          {username:element.textContent, tabindex:week.indexOf(cellIndex), rowindex:rowIndex-1}
-        );
+        tab[week.indexOf(cellIndex)][rowIndex-1]={username:element.textContent};
         tabSort();
         update();
         /*$(document).on('hidden.bs.modal', '#exampleModal', function(e){
@@ -131,47 +137,24 @@
         //row index
         rowIndex = button.parents('tr')["0"].rowIndex;
       });
-      
       /*
-      * функция обновления
-      * Очищает таблицу
-      * загружает список с сервера
-      * вносит данные в таблицу
+      *      #groupselect option changed event 
       */
-      function refresh(){
-        $('.table').hide();
-        $("#table tbody tr").remove();
-        let tbody;
-        let lastNumber = 0;
-        $.get( "/user/list", function( data, err ) {
-            data.forEach(function(item){
-                tbody = tbody + '<tr>' +
-                '<th>'+ lastNumber++ +'</th>' +
-                '<td>'+item.name+'</td>' +
-                '<td>'+item.surname+'</td>' +
-                '<td>'+item.username+'</td>' +
-                '<td><span class="btn btn-secondary edit pull-center"><i class="fas fa-edit"></i></span><span class="btn btn-danger minus pull-center"><i class="fas fa-trash-alt"></i></span></td>' +
-              '</tr>';
-              
-            });
-            $('.table').append(tbody);
-        });
-        $('.table').fadeIn(10);
-        $("#name").val('');
-        $("#surname").val('');
-        $("#username").val('');
-        $("#password").val('');
-      };
+      document.getElementById('groupSelect').addEventListener("change", function(){
+        tab = [];
+        tablesInit(document.getElementById('groupSelect').value);
+      });
       /*
       *      обновление при открытии
       */
       function tablesInit(i){
-        $.get("/edu/list/1", function (data) {
+        document.getElementsByClassName('row')[0].innerHTML = '';
+        document.getElementsByClassName('row')[1].innerHTML = '';
+        $.get("/edu/list/"+i, function (data) {
           JSON.parse(data).forEach(function(item, i){
             let row = i<3?0:1;
-
             if(item){
-              $('div.row:eq('+row+')').append(
+              $('div.row:eq('+(i<3?0:1)+')').append(
               `<table class="table form-group col m-2" id="table">
                 <thead>
                   <tr>
@@ -181,7 +164,7 @@
                 <tbody>`+tds(item)+`</tbody>
               </table>`)
             }else{
-              $('div.row:eq('+row+')').append(
+              $('div.row:eq('+(i<3?0:1)+')').append(
               `<table class="table form-group col m-2" id="table">
                 <thead>
                   <tr>
@@ -194,44 +177,19 @@
           });
         });
       }
-      /*$(document).ready(function(){
-        week.forEach(function(item, i){
-          if(i<3){
-            $('div.row:eq(0)').append(
-              `<table class="table form-group col m-2" id="table">
-                <thead>
-                  <tr>
-                    <th  class="float-center" scope="col">`+item+`</th>
-                  </tr>
-                </thead>
-                <tbody>`+tds()+`</tbody>
-              </table>`)
-          }
-          else{
-            $('div.row:eq(1)').append(`
-              <table class="table form-group col m-2" id="table">
-                <thead>
-                  <tr>
-                    <th  class="float-center" scope="col">`+item+`</th>
-                  </tr>
-                </thead>
-                <tbody>`+tds()+`</tbody>
-              </table>`)
-          }
-        });
-      });*/
       function tds(item){
         var tds = '';
         for(let i=0; i < 6; i++){
           if(item){
             if(item[i]) {
-              console.log(item[i].username);
               tds+=trsPattern(item[0].username);
             }else tds+=trsPattern();
           }else tds+=trsPattern();
-          
         }
         return tds;
+      };
+      function tablePattern(){
+
       };
       function trsPattern(cont){
         cont = typeof cont !== 'undefined' ?  '<h4>'+cont+'</h4>' : `<button type="button" class="col btn btn-success" data-toggle="modal" data-target="#exampleModal">
@@ -242,5 +200,5 @@
               `+cont+`
             </td>
           </tr>`;
-      }
+      };
 </script>
