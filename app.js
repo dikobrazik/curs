@@ -52,4 +52,4 @@ try {
 
 // Start server
 sails.lift(rc('sails'));
-console.log(sails.getBaseUrl());
+//console.log(sails.getBaseUrl());
