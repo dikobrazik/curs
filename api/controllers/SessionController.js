@@ -45,8 +45,10 @@ module.exports = {
 
     index: function (req, res) {
         if(req.session.auth){
+
             return res.redirect('/groups');
         }
+        console.log(sails.config.appUrl);
         return res.view();
     }
 };
