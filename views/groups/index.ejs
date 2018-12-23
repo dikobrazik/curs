@@ -1,14 +1,15 @@
+<%- include('../layouts/nav.ejs')%>
 <div class="container">
-    <%- include('../layouts/nav.ejs') %>
-
-    <div class="col-md-8 d-inline-block mr-1 mt-4 pb-2 float-right bg-light border border-primary">
-      <%- include('groupAddTab.ejs') %>
-    </div>
-    <footer class="footer fixed-bottom bg-dark">
-          <div class="container">
-              <span class="text-muted">Place sticky footer content here.</span>
-          </div>
-    </footer>
+  <%- include('../layouts/navBlock.ejs') %>
+  <div class="col-md-8 d-inline-block sticky-top mr-1 my-4 pb-2 float-right bg-light ">
+        <%- include('groupAddTab.ejs') %>
+  </div>
+</div>
+<footer class="footer fixed-bottom bg-dark mt-4">
+      <div class="container">
+          <span class="text-muted">Place sticky footer content here.</span>
+      </div>
+</footer>
     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -27,17 +28,17 @@
         </div>
       </div>
     </div>
-</div>
 <script>
   var $ = jQuery.noConflict();
   var groups;
-
+  
   $(document).ready(function(){
     $.get( "/groups/list", function( data, err ) {
       groups = data;
       data.forEach(function(item, i){
         $('#gNum').append('<option>'+item.gNum+'</option>');
       });
+      initTable();
     });
   });
 
@@ -61,31 +62,7 @@
   });
   
   $('#gNum').change(function(){
-    $("#table tbody tr").remove();
-    let table;
-    let lastNumber = 0;
-    groups.find(function(item, i){
-      if(item.gNum==$('#gNum').val()) table = JSON.parse(item.content);
-    });
-    let tableRow = document.createElement('tr');
-    table.appendChild(document.createElement('th'));
-
-    table.appendChild(document.createElement('td'));
-    table.appendChild(document.createElement('td'));
-    table.appendChild(document.createElement('td'));
-
-    table.forEach(function(item){
-      
-      $('.table').append(
-      '<tr>' +
-        '<th>'+ lastNumber++ +'</th>' +
-        '<td>'+item.name+'</td>' +
-        '<td>'+item.surname+'</td>' +
-        '<td>'+item.studentID+'</td>' +
-        '<td><span class="btn btn-danger minus pull-center">&ndash;</span></td>' +
-      '</tr>'
-      );
-    });
+    initTable();
   });
   $("#createGroup").change(function(){
     $('#gNumInput').removeClass('d-none');
@@ -125,6 +102,32 @@
         $.post("/groups/create", msg, function(data, status){});
       });
   });
+  function initTable(){
+    $("#table tbody tr").remove();
+    let table;
+    let lastNumber = 0;
+    groups.find(function(item, i){
+      if(item.gNum==document.getElementById('gNum').options[document.getElementById('gNum').selectedIndex].value) table = JSON.parse(item.content);
+    });
+    let tableRow = document.createElement('tr');
+    let th = tableRow.appendChild(document.createElement('th'));
+    tableRow.appendChild(document.createElement('td'));
+    tableRow.appendChild(document.createElement('td'));
+    tableRow.appendChild(document.createElement('td'));
+    table.forEach(function(item){
+      
+      $('.table').append(
+      '<tr>' +
+        '<th>'+ lastNumber++ +'</th>' +
+        '<td>'+item.name+'</td>' +
+        '<td>'+item.surname+'</td>' +
+        '<td>'+item.studentID+'</td>' +
+        '<td><span class="btn btn-danger minus pull-center">&ndash;</span></td>' +
+      '</tr>'
+      );
+    });
+    
+  }
   document.getElementById('gNumInput').addEventListener("change",function(val){
     if(groups.indexOf(val.target.value) != -1){
       val.target.value='';

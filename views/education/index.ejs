@@ -1,43 +1,42 @@
+<%- include('../layouts/nav.ejs') %>
 <div class="container">
-
-        <%- include('../layouts/nav.ejs') %>
-        <div class="col-md-8 d-inline-block mr-1 mt-4 pb-2 float-right bg-light border border-primary">
-          <!--<%- include('lessonAddBlock.ejs') %>-->
-          <select class="form-control mt-2 groupSelect" id="groupSelect">
-          </select>
-          <div class="row">
-          </div>
-          <div class="row">
-          </div>
-            <!-- Modal -->
-            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-              <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-                  <div class="modal-body">
-                    <select class="form-control" id="userSelect">
-                      
-                    </select>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary modal-save">Save changes</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        <footer class="footer fixed-bottom bg-dark">
-              <div class="container">
-                  <span class="text-muted">Place sticky footer content here.</span>
-              </div>
-        </footer>
+<%- include('../layouts/navBlock.ejs') %>
+  <div class="col-md-8 d-inline-block mr-1 mt-4 pb-2 float-right bg-light">
+    <select class="form-control mt-2 groupSelect" id="groupSelect">
+    </select>
+    <div class="row">
     </div>
+    <div class="row">
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <select class="form-control" id="userSelect">
+              
+            </select>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary modal-save">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<footer class="footer fixed-bottom bg-dark">
+      <div class="container">
+          <span class="text-muted">Place sticky footer content here.</span>
+      </div>
+</footer>
     <script>
       var $ = jQuery.noConflict();
       var trdata = [];
@@ -52,10 +51,10 @@
             });
           });
           $.get("/groups/list", function (data) {
-            tablesInit(data[0]);
             data.forEach(function(item){
-              $('#groupSelect').append('<option>'+item +'</option>');
+              $('#groupSelect').append('<option>'+item.gNum +'</option>');
             });
+            tablesInit(data[0].gNum);
           });
       });
       /*
@@ -153,32 +152,21 @@
         $.get("/edu/list/"+i, function (data) {
           JSON.parse(data).forEach(function(item, i){
             let row = i<3?0:1;
-            if(item){
-              $('div.row:eq('+(i<3?0:1)+')').append(
-              `<table class="table form-group col m-2" id="table">
-                <thead>
-                  <tr>
-                    <th  class="float-center" scope="col">`+week[i]+`</th>
-                  </tr>
-                </thead>
-                <tbody>`+tds(item)+`</tbody>
-              </table>`)
-            }else{
-              $('div.row:eq('+(i<3?0:1)+')').append(
-              `<table class="table form-group col m-2" id="table">
-                <thead>
-                  <tr>
-                    <th  class="float-center" scope="col">`+week[i]+`</th>
-                  </tr>
-                </thead>
-                <tbody>`+tds()+`</tbody>
-              </table>`)
-            }
+            $('div.row:eq('+row+')').append(
+            `<table class="table form-group col m-2" id="table">
+              <thead>
+                <tr>
+                  <th  class="float-center" scope="col">`+week[i]+`</th>
+                </tr>
+              </thead>
+              <tbody>`+tds(item)+`</tbody>
+            </table>`);
           });
         });
       }
       function tds(item){
         var tds = '';
+        console.log(typeof item);
         for(let i=0; i < 6; i++){
           if(item){
             if(item[i]) {
