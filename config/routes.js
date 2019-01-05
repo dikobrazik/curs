@@ -71,6 +71,11 @@ module.exports.routes = {
     action: 'create'
   },
 
+  'post /groups/deleteElement': {
+    controller: 'groups',
+    action: 'deleteElements'
+  },
+
   /*
   *      /USER/....
   */

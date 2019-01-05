@@ -31,7 +31,56 @@
 <script>
   var $ = jQuery.noConflict();
   var groups;
-  
+  document.addEventListener("DOMContentLoaded", function(event) {
+    /*$.get("/csrfToken", function (data, jwres) {
+      if (jwres != 'success') { return false; }
+      document.cookie = 'lol='+data._csrf;
+    }); */
+    // Обработка евентов
+    document.getElementById('gNum').addEventListener('change', function(){
+      initTable();
+    });
+    document.getElementById('createGroup').addEventListener('change', function(){
+      clearTable();
+      document.getElementById('send-json').classList.remove("d-none");
+      document.getElementById('gNum').classList.add("d-none");
+      document.getElementById('gNumInput').classList.remove("d-none");
+    });
+    document.getElementById('upgradeGroup').addEventListener('change', function(){
+      initTable();
+      document.getElementById('send-json').classList.add("d-none");
+      document.getElementById('gNum').classList.remove("d-none");
+      document.getElementById('gNumInput').classList.add("d-none");
+    });
+    /*
+    *       Отправка новой группы на сервер
+    */
+    document.getElementById('send-json').addEventListener('click',function(){
+      var content = [];
+      if(document.getElementById('gNumInput').value == ""){
+        alert('Введите номер группы!');
+        return;
+      } 
+      for(let tr of document.getElementsByTagName('tbody')[0].getElementsByTagName('tr')){
+        content.push({
+          name:tr.children[1].textContent,
+          surname:tr.children[2].textContent,
+          studentID:tr.children[3].textContent,
+        });
+      }
+      $.get("/csrfToken", function (data, jwres) {
+        if (jwres != 'success') { return false; }
+        msg = {
+          some_data: {
+            gNum:document.getElementById('gNumInput').value,
+            content:JSON.stringify(content)
+          },
+          _csrf: data._csrf
+        };
+        $.post("/groups/create", msg, function(data, status){});
+      });
+    });
+  });
   $(document).ready(function(){
     $.get( "/groups/list", function( data, err ) {
       groups = data;
@@ -53,7 +102,7 @@
         '<td>'+$("#name").val()+'</td>' +
         '<td>'+$("#surname").val()+'</td>' +
         '<td>'+$("#studentID").val()+'</td>' +
-        '<td><span class="btn btn-danger minus pull-center">&ndash;</span></td>' +
+        '<td class="d-none d-sm-block"><span class="btn btn-danger minus pull-center" id="minus">&ndash;</span></td>' +
       '</tr>'
       );
       $("#name").val('');
@@ -61,49 +110,11 @@
       $("#studentID").val('');
   });
   
-  $('#gNum').change(function(){
-    initTable();
-  });
-  $("#createGroup").change(function(){
-    $('#gNumInput').removeClass('d-none');
-    $('#gNum').addClass('d-none');
-  });
-  $("#upgradeGroup").change(function(){
-    $('#gNum').removeClass('d-none');
-    $('#gNumInput').addClass('d-none');
-  });
-  // on - так как элемент динамически создан и обычный обработчик с ним не работает
-  $(document).on('click', '.minus', function(){
-    $( this ).closest( 'tr' ).remove(); // удаление строки с полями
-  });
-
-  $(function () {
-    $('[data-toggle="popover"]').popover();
-    $('.popover-dismiss').popover({
-      trigger: 'focus'
-    });
-  });
   
-  $('.send-json').click(function(){
-    var content = [];
-    $("#table tbody tr").each(function(){
-          content.push({
-            name:this.cells[1].innerText,
-            surname:this.cells[2].innerText,
-            studentID:this.cells[3].innerText,
-          });
-      });
-     $.get("/csrfToken", function (data, jwres) {
-        if (jwres != 'success') { return false; }
-        msg = {
-          some_data: {gNum:$("#gNum").val(), content:JSON.stringify(content)},
-          _csrf: data._csrf
-        };
-        $.post("/groups/create", msg, function(data, status){});
-      });
-  });
+  
+  
   function initTable(){
-    $("#table tbody tr").remove();
+    clearTable();
     let table;
     let lastNumber = 0;
     groups.find(function(item, i){
@@ -115,23 +126,67 @@
     tableRow.appendChild(document.createElement('td'));
     tableRow.appendChild(document.createElement('td'));
     table.forEach(function(item){
-      
       $('.table').append(
       '<tr>' +
         '<th>'+ lastNumber++ +'</th>' +
         '<td>'+item.name+'</td>' +
         '<td>'+item.surname+'</td>' +
         '<td>'+item.studentID+'</td>' +
-        '<td><span class="btn btn-danger minus pull-center">&ndash;</span></td>' +
+        '<td class="d-none d-sm-block"><span class="btn btn-danger minus pull-center">&ndash;</span></td>' +
       '</tr>'
       );
     });
-    
+    for(let tr of document.getElementsByTagName('tbody')[0].getElementsByTagName('tr')){
+      let start;
+      tr.addEventListener("touchstart", handleStart, false);
+      tr.addEventListener("touchend", handleEnd, false);
+      function handleStart(evt) {
+        start = new Date();
+      };
+      function handleEnd(evt) {
+        if(new Date()-start > 500) $('#exampleModal').modal('toggle');
+      };
+    }
+    for(let td of document.getElementsByClassName('minus')){
+      td.addEventListener('click', function(){
+        if(this.parentElement.parentElement.parentElement.lastElementChild == this.parentElement.parentElement){
+          delRow(this.parentElement.parentElement.rowIndex-1);
+          this.parentElement.parentElement.remove();
+          
+        }
+        else{
+          let el = this.parentElement.parentElement.nextSibling;
+          delRow(this.parentElement.parentElement.rowIndex-1);
+          this.parentElement.parentElement.remove()
+          el.children[0].textContent = (parseInt(el.children[0].textContent)-1)
+          while(el=el.nextSibling){
+            el.children[0].textContent = (parseInt(el.children[0].textContent)-1)
+          } 
+        }
+      });
+    };
   }
   document.getElementById('gNumInput').addEventListener("change",function(val){
-    if(groups.indexOf(val.target.value) != -1){
+    if(groups.filter(item=>{return (item.gNum==val.target.value)}).length != 0){
       val.target.value='';
+      //alert('Номер новой группы не может совпадать с номером уже существующей группы');
       $('#exampleModal').modal('toggle');
     } 
   });
+
+  function clearTable(){
+    document.getElementsByTagName('tbody')[0].innerHTML = ""
+  }
+
+  function delRow(index){
+    $.get("/csrfToken", function (data, jwres) {
+      if (jwres != 'success') { return false; }
+      msg = {
+        index: index,
+        gNum:document.getElementById('gNum').selectedIndex,
+        _csrf: data._csrf
+      };
+      $.post("/groups/deleteElement", msg, function(data, status){});
+    });
+  }
 </script>
