@@ -10,9 +10,7 @@ module.exports = {
     create: function (req, res) {
         var username = req.param('username'),
             password = req.param('password');
-        if(req.headers.MobileApp){
-            return res.send('lol');
-        }
+        console.log(req.headers)
         if (!username || !password) {
             return res.redirect('/login');
         };
@@ -20,7 +18,7 @@ module.exports = {
             return res.redirect('/groups');
         };
         User.find({username:username}).exec(function (err, user) {
-            if (!user || err) return res.sendStatus(500);
+            if (!user || err) return res.redirect('/login');
             var hash = crypto.createHash('sha256');
             hash.update(password);
             var hHash = hash.digest('hex');

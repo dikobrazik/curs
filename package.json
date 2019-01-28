@@ -32,15 +32,6 @@
   },
   "devDependencies": {
     "@sailshq/eslint": "^4.19.3",
-    "grunt": "^1.0.1",
-    "grunt-contrib-handlebars": "^1.0.0",
-    "grunt-contrib-less": "2.0.0",
-    "grunt-contrib-sass": "^1.0.0",
-    "grunt-contrib-watch": "^1.1.0",
-    "grunt-sass": "^3.0.2",
-    "grunt-sync": "0.8.0",
-    "jit-grunt": "^0.10.0",
-    "node-sass": "^4.11.0"
   },
   "scripts": {
     "start": "node app.js --prod",
@@ -51,9 +42,9 @@
   "main": "app.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/anonymous node/sails user/edu-ss.git"
+    "url": "https://github.com/dikobrazik/curs.git"
   },
-  "author": "anonymous node/sails user",
+  "author": "dikobraz",
   "license": "",
   "engines": {
     "node": "^10.14"
