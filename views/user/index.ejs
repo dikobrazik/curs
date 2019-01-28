@@ -110,34 +110,6 @@
             });
         });
       });
-      /*$('.sumbit').click(function(){
-        alert('l');
-        $.get("/csrfToken", function (data, jwres) {
-            if (jwres != 'success') { return false; }
-            msg = {
-                data: 
-                    {name:name,
-                    surname:surname,
-                    username:username,
-                    },
-                ndata: 
-                    {name:name,
-                    surname:surname,
-                    username:username,
-                    password:password,
-                    },
-                _csrf: 
-                    data._csrf
-            };
-            $.post("/user/update", msg, function(data, status){
-                if(status=='success'){
-                    refresh();
-                }else{
-                    alert(status);
-                }
-            });
-        });
-      });*/
       $('.plus').click(function(){
          $.get("/csrfToken", function (data, jwres) {
             if (jwres != 'success') { return false; }
@@ -150,10 +122,10 @@
               _csrf: data._csrf
             };
             $.post("/user/create", msg, function(data, status){
-                if(status=='success'){
-                    refresh();
+                if(data == 'Short password.'){
+                    alert('Длина пароля должна быть минимум 5 символов');
                 }else{
-                    alert(status);
+                  refresh();
                 }
             });
           });

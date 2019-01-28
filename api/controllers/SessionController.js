@@ -10,6 +10,9 @@ module.exports = {
     create: function (req, res) {
         var username = req.param('username'),
             password = req.param('password');
+        if(req.headers.MobileApp){
+            return res.send('lol');
+        }
         if (!username || !password) {
             return res.redirect('/login');
         };

@@ -15,6 +15,10 @@ module.exports = {
             password : req.param('data').password,
             //admin    : req.param('admin')
         };
+        if(elem.password.length > 0 && elem.password.length < 5){
+            console.log('daa');
+            return res.status(200).send('Short password.');
+        } 
         User.create(elem).exec(function (err, user) {
             console.log(err);
             if (err) return res.sendStatus(500);
@@ -56,6 +60,10 @@ module.exports = {
             password:req.param('ndata').password
         };
         console.log(Id[0].id);
+        if(elem.password.length > 0 && elem.password.length < 5){
+            console.log('daa');
+            return res.status(200).send('Short password.');
+        } 
         if(!elem.password){
             console.log('password field empty');
             delete elem.password;
