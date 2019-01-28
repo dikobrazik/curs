@@ -250,10 +250,10 @@ module.exports = {
     * > Be sure to use the right protocol!  ("http://" vs. "https://")         *
     *                                                                          *
     ***************************************************************************/
-     //onlyAllowOrigins: [
-       //'http://localhost:1337',
+     onlyAllowOrigins: [
+       'https://gentle-depths-43328.herokuapp.com',
        //'https://exampleaaa.com',
-     //],
+     ],
 
 
     /***************************************************************************
