@@ -31,7 +31,7 @@
     "node-sass": "^4.11.0"
   },
   "devDependencies": {
-    "@sailshq/eslint": "^4.19.3",
+    "@sailshq/eslint": "^4.19.3"
   },
   "scripts": {
     "start": "node app.js --prod",
