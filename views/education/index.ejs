@@ -37,26 +37,34 @@
           <span class="text-muted">Place sticky footer content here.</span>
       </div>
 </footer>
-    <script>
+    <script >
       var $ = jQuery.noConflict();
       var trdata = [];
       var cellIndex;
       var rowIndex;
+      var data;
       var week = ['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
       var tab = [];
-      $(document).ready(function(){
-          $.get("/user/list", function (data) {
-            data.forEach(function(item){
-              $('#userSelect').append('<option>'+item.name + ' ' + item.surname+'</option>');
-            });
+      fetch('/user/list')
+        .then(response => response.json())
+        .then(data => {
+          data.forEach(item => {
+            let option = document.createElement('option');
+            option.innerHTML = item.name + ' ' + item.surname;
+            document.getElementById('userSelect').appendChild(option)
           });
-          $.get("/groups/list", function (data) {
-            data.forEach(function(item){
-              $('#groupSelect').append('<option>'+item.gNum +'</option>');
-            });
-            tablesInit(data[0].gNum);
+        });
+      fetch('/groups/list')
+        .then(response => response.json())
+        .then(data => {
+          tablesInit(data[0].gNum);
+          data.forEach(item => {
+            let option = document.createElement('option');
+            option.innerHTML = item.gNum;
+            document.getElementById('groupSelect').appendChild(option)
           });
-      });
+          
+        })
       /*
       *    Обработка кнопки SAVE модального окна
       */
@@ -65,44 +73,19 @@
         let height = element.offsetHeight;
         element.innerHTML = '<h4>'+document.getElementById('userSelect').value+'</h4>';
         element.style.height = height + 'px';
-       // $('#table').find('thead tr th').text('lol');
+        document.getElementById('exampleModal').modal('hide');
         $('#exampleModal').modal('hide');
         if(!tab[0]){
           tab.length = 6;
           for(var i = 0; i < 6; i++){
             tab[i] = [];
             tab[i].length = 6;
-            /*for(var j = 0; j < 6; j++){
-              tab[i][j] = []
-            }*/
           }
-          //tab[week.indexOf(cellIndex)] = [];
         }
+        console.log(tab)
         tab[week.indexOf(cellIndex)][rowIndex-1]={username:element.textContent};
-        tabSort();
         update();
-        /*$(document).on('hidden.bs.modal', '#exampleModal', function(e){
-            console.log(document.getElementsByTagName('table'));
-        });*/
       });
-
-      /*
-      *   Сортировка JSON
-      */
-      function tabSort(){
-        tab.forEach(function(item){
-          item.sort(function (a, b) {
-            if (a.rowindex > b.rowindex) {
-              return 1;
-            }
-            if (a.rowindex < b.rowindex) {
-              return -1;
-            }
-            // a должно быть равным b
-            return 0;
-          });
-        });
-      }
       /*
       *   UPDATE TABLE ROW
       */
@@ -111,8 +94,9 @@
             if (jwres != 'success') { return false; }
             msg = {
               data: 
-                {gNum:document.getElementById('groupSelect').value,
-                content:JSON.stringify(tab),
+                {
+                  gNum:document.getElementById('groupSelect').value,
+                  content:JSON.stringify(tab),
                 },
               _csrf: data._csrf
             };
@@ -136,6 +120,9 @@
         //row index
         rowIndex = button.parents('tr')["0"].rowIndex;
       });
+      function plusPress(el){
+        rowIndex = el;
+      };
       /*
       *      #groupselect option changed event 
       */
@@ -149,28 +136,31 @@
       function tablesInit(i){
         document.getElementsByClassName('row')[0].innerHTML = '';
         document.getElementsByClassName('row')[1].innerHTML = '';
-        $.get("/edu/list/"+i, function (data) {
-          JSON.parse(data).forEach(function(item, i){
-            let row = i<3?0:1;
-            $('div.row:eq('+row+')').append(
-            `<table class="table form-group col m-2" id="table">
-              <thead>
-                <tr>
-                  <th  class="float-center" scope="col">`+week[i]+`</th>
-                </tr>
-              </thead>
-              <tbody>`+tds(item)+`</tbody>
-            </table>`);
+        fetch('/edu/list/'+i)
+          .then(response=>response.json())
+          .then(data => {
+            tab = data;
+            data.forEach(function(item, i){
+              let row = i<3?0:1;
+              document.getElementsByClassName('row')[row].innerHTML = 
+                document.getElementsByClassName('row')[row].innerHTML + 
+                `<table class="table form-group col m-2" id="table">
+                  <thead>
+                    <tr>
+                      <th  class="float-center" scope="col">`+week[i]+`</th>
+                    </tr>
+                  </thead>
+                  <tbody>`+tds(item)+`</tbody>
+                </table>`;
+            });
           });
-        });
       }
       function tds(item){
         var tds = '';
-        console.log(typeof item);
         for(let i=0; i < 6; i++){
           if(item){
             if(item[i]) {
-              tds+=trsPattern(item[0].username);
+              tds+=trsPattern(item[i].username);
             }else tds+=trsPattern();
           }else tds+=trsPattern();
         }
@@ -180,7 +170,7 @@
 
       };
       function trsPattern(cont){
-        cont = typeof cont !== 'undefined' ?  '<h4>'+cont+'</h4>' : `<button type="button" class="col btn btn-success" data-toggle="modal" data-target="#exampleModal">
+        cont = typeof cont !== 'undefined' ?  '<h4>'+cont+'</h4>' : `<button name="plus" type="button" class="col btn btn-success" data-toggle="modal" onclick="plusPress(this)" data-target="#exampleModal">
                 <i class="fas fa-plus"></i>
               </button>`;
         return `<tr class="d-flex justify-content-center">
