@@ -31,7 +31,7 @@ module.exports = {
                     req.session.auth = true;
                     req.session.User = user;
                     console.log(req.session);
-                    if(req.headers['user-agent'] == 'mobile-app') res.send(req.session);
+                    if(req.headers['user-agent'] == 'mobile-app') res.send(req.session.User);
                     if (req.session.User.admin) {
                         return res.redirect('/groups');
                     }

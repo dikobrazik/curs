@@ -64,7 +64,7 @@
             document.getElementById('groupSelect').appendChild(option)
           });
           
-        })
+        });
       /*
       *    Обработка кнопки SAVE модального окна
       */
@@ -73,7 +73,6 @@
         let height = element.offsetHeight;
         element.innerHTML = '<h4>'+document.getElementById('userSelect').value+'</h4>';
         element.style.height = height + 'px';
-        document.getElementById('exampleModal').modal('hide');
         $('#exampleModal').modal('hide');
         if(!tab[0]){
           tab.length = 6;
@@ -82,7 +81,6 @@
             tab[i].length = 6;
           }
         }
-        console.log(tab)
         tab[week.indexOf(cellIndex)][rowIndex-1]={username:element.textContent};
         update();
       });
@@ -90,24 +88,25 @@
       *   UPDATE TABLE ROW
       */
       function update(){
-        $.get("/csrfToken", function (data, jwres) {
-            if (jwres != 'success') { return false; }
+        fetch('/csrfToken')
+          .then(response => response.json())
+          .then(res => {
             msg = {
               data: 
                 {
                   gNum:document.getElementById('groupSelect').value,
                   content:JSON.stringify(tab),
                 },
-              _csrf: data._csrf
+              _csrf: res._csrf
             };
-            $.post("/edu/update", msg, function(data, status){
-                if(status=='success'){
-                  alert(status)
-                }else{
-                  alert(status);
-                }
-            });
-        });
+            fetch('/edu/update',{
+              method:'POST',
+              body:JSON.stringify(msg),
+            })
+              .then(res => res.ok?'Ok':'Err')
+              .then(answer => console.log(answer))
+              .catch(res => console.log(response))
+          })
       }
       /*
       *    Обработка кнопки "+" некоторой таблицы
@@ -140,6 +139,7 @@
           .then(response=>response.json())
           .then(data => {
             tab = data;
+            console.log(data)
             data.forEach(function(item, i){
               let row = i<3?0:1;
               document.getElementsByClassName('row')[row].innerHTML = 
@@ -153,7 +153,8 @@
                   <tbody>`+tds(item)+`</tbody>
                 </table>`;
             });
-          });
+          })
+          .catch(err=>console.log(err))
       }
       function tds(item){
         var tds = '';

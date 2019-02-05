@@ -55,9 +55,12 @@ module.exports.routes = {
   },
   'get /edu/list/:index': {
     controller: 'education',
-    action: 'list'
+    action: 'timetable'
+  },//группы в которых преподает данный препод
+  'get /edu/groups': {
+    controller: 'education',
+    action: 'teacherGroups'
   },
-
   /*
   *      /GROUPS/....
   */
