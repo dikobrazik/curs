@@ -39,32 +39,29 @@
 </footer>
     <script >
       var $ = jQuery.noConflict();
-      var trdata = [];
-      var cellIndex;
-      var rowIndex;
-      var data;
-      var week = ['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
-      var tab = [];
+      let cellIndex;
+      let rowIndex;
+      const week = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
+      let tab = [];
       fetch('/user/list')
-        .then(response => response.json())
-        .then(data => {
-          data.forEach(item => {
-            let option = document.createElement('option');
-            option.innerHTML = item.name + ' ' + item.surname;
-            document.getElementById('userSelect').appendChild(option)
-          });
+      .then(response => response.json())
+      .then(data => {
+        data.forEach(item => {
+          let option = document.createElement('option');
+          option.innerHTML = item.name + ' ' + item.surname;
+          document.getElementById('userSelect').appendChild(option)
         });
+      });
       fetch('/groups/list')
-        .then(response => response.json())
-        .then(data => {
-          tablesInit(data[0].gNum);
-          data.forEach(item => {
-            let option = document.createElement('option');
-            option.innerHTML = item.gNum;
-            document.getElementById('groupSelect').appendChild(option)
-          });
-          
+      .then(response => response.json())
+      .then(data => {
+        tablesInit(data[0].gNum);
+        data.forEach(item => {
+          let option = document.createElement('option');
+          option.innerHTML = item.gNum;
+          document.getElementById('groupSelect').appendChild(option)
         });
+      });
       /*
       *    Обработка кнопки SAVE модального окна
       */
@@ -76,7 +73,7 @@
         $('#exampleModal').modal('hide');
         if(!tab[0]){
           tab.length = 6;
-          for(var i = 0; i < 6; i++){
+          for(let i = 0; i < 6; i++){
             tab[i] = [];
             tab[i].length = 6;
           }
@@ -112,7 +109,7 @@
       *    Обработка кнопки "+" некоторой таблицы
       */
       $(document).on('click', 'button[data-toggle="modal"]', function (event) {
-        var button = $(event.target);
+        const button = $(event.target);
         //table name
         cellIndex = button.parents('#table').find('thead tr th').text();
         $('.modal-title').text(cellIndex);
@@ -136,10 +133,12 @@
         document.getElementsByClassName('row')[0].innerHTML = '';
         document.getElementsByClassName('row')[1].innerHTML = '';
         fetch('/edu/list/'+i)
-          .then(response=>response.json())
+          .then(response=>{
+            if(response.status === 204) return [null, null,null, null, null, null]
+            return response.json()
+          })
           .then(data => {
             tab = data;
-            console.log(data)
             data.forEach(function(item, i){
               let row = i<3?0:1;
               document.getElementsByClassName('row')[row].innerHTML = 
@@ -154,10 +153,10 @@
                 </table>`;
             });
           })
-          .catch(err=>console.log(err))
+          .catch(err=>{console.log(err)})
       }
       function tds(item){
-        var tds = '';
+        let tds = '';
         for(let i=0; i < 6; i++){
           if(item){
             if(item[i]) {

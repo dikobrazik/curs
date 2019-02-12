@@ -8,8 +8,8 @@
 module.exports = {
     create: function (req, res) {
         var elem = {
-            gNum : req.param('some_data').gNum,
-            content : req.param('some_data').content,
+            gNum : req.param('data').gNum,
+            content : req.param('data').content,
         };
         Groups.create(elem).exec(function (err, groups) {
             if (err) {
@@ -23,9 +23,9 @@ module.exports = {
     },
     deleteElement: function(req, res){
         Groups.find().exec(function(err, groups){
-            let content = JSON.parse(groups[req.param('gNum')].content);
-            content.splice(req.param('index'), 1);
-            Groups.update(groups[req.param('gNum')].id, {content:JSON.stringify(content)}).exec(function(err){
+            let content = JSON.parse(groups[req.param('data').gNum].content);
+            content.splice(req.param('data').index, 1);
+            Groups.update(groups[req.param('data').gNum].id, {content:JSON.stringify(content)}).exec(function(err){
                 if(err){
                     console.log(err);
                     return res.sendStatus(500);
@@ -33,10 +33,6 @@ module.exports = {
                 return res.ok();
             });
         });
-        /*Groups.update().exec(function(err){
-            if(err) return res.send(500);
-            return res.ok();
-        });*/
     },
     list: function(req,res){
         Groups.find()

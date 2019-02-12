@@ -10,7 +10,7 @@
           <span class="text-muted">Place sticky footer content here.</span>
       </div>
 </footer>
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="warningModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -32,10 +32,6 @@
   var $ = jQuery.noConflict();
   var groups;
   document.addEventListener("DOMContentLoaded", function(event) {
-    /*$.get("/csrfToken", function (data, jwres) {
-      if (jwres != 'success') { return false; }
-      document.cookie = 'lol='+data._csrf;
-    }); */
     // Обработка евентов
     document.getElementById('gNum').addEventListener('change', function(){
       initTable();
@@ -52,67 +48,98 @@
       document.getElementById('gNum').classList.remove("d-none");
       document.getElementById('gNumInput').classList.add("d-none");
     });
-    /*
+    fetch('/groups/list')
+      .then(response => response.json())
+      .then(data => 
+        {
+          groups = data;
+          var select = document.getElementById('gNum');
+          for(index in data) {
+              select.options[select.options.length] = new Option(data[index].gNum);
+          }
+          initTable();
+        })
+  });
+  /*
     *       Отправка новой группы на сервер
     */
-    document.getElementById('send-json').addEventListener('click',function(){
-      var content = [];
-      if(document.getElementById('gNumInput').value == ""){
-        alert('Введите номер группы!');
-        return;
-      } 
-      for(let tr of document.getElementsByTagName('tbody')[0].getElementsByTagName('tr')){
-        content.push({
-          name:tr.children[1].textContent,
-          surname:tr.children[2].textContent,
-          studentID:tr.children[3].textContent,
-        });
-      }
-      $.get("/csrfToken", function (data, jwres) {
-        if (jwres != 'success') { return false; }
+  document.getElementById('send-json').addEventListener('click',function(){
+    var content = [];
+    if(document.getElementById('gNumInput').value == ""){
+      alert('Введите номер группы!');
+      return;
+    } 
+    if(groups.filter(item=>
+        {
+          return (item.gNum===document.getElementById('gNumInput').value)
+        }).length != 0){
+      document.getElementById('gNumInput').value='';
+      //alert('Номер новой группы не может совпадать с номером уже существующей группы');
+      $('#warningModal').modal('toggle');
+      return;
+    }
+    for(let tr of document.getElementsByTagName('tbody')[0].getElementsByTagName('tr')){
+      content.push({
+        name:tr.children[1].textContent,
+        surname:tr.children[2].textContent,
+        studentID:tr.children[3].textContent,
+      });
+    }
+    fetch('/csrfToken')
+      .then(response => response.json())
+      .then(res => {
         msg = {
-          some_data: {
-            gNum:document.getElementById('gNumInput').value,
-            content:JSON.stringify(content)
-          },
-          _csrf: data._csrf
+          data: 
+            {
+              gNum:document.getElementById('gNumInput').value,
+              content:JSON.stringify(content),
+            },
+          _csrf: res._csrf
         };
-        $.post("/groups/create", msg, function(data, status){});
-      });
-    });
-  });
-  $(document).ready(function(){
-    $.get( "/groups/list", function( data, err ) {
-      groups = data;
-      data.forEach(function(item, i){
-        $('#gNum').append('<option>'+item.gNum+'</option>');
-      });
-      initTable();
-    });
+        fetch('/groups/create',{
+          method:'POST',
+          body:JSON.stringify(msg),
+        })
+          .then(res => res.ok?'Ok':'Err')
+          .then(answer => 
+            {
+              fetch('/groups/list')
+              .then(response => response.json())
+              .then(data => 
+                {
+                  groups = data;
+                  document.getElementById('gNum').innerHTML = '';
+                  var select = document.getElementById('gNum');
+                  for(index in data) {
+                      select.options[select.options.length] = new Option(data[index].gNum)
+                  }
+                });
+              console.log(answer);
+            })
+          .catch(res => console.log(response))
+      })
   });
 
   // формируем новые поля
-  $('.plus').click(function(){
-    let lastNumber;
-    if($('#table tbody tr').length == 0) lastNumber = 0;
-    else lastNumber = parseInt($('#table').find('tbody').find('th').last().text())+1;
-    $('.table').append(
-      '<tr>' +
-        '<th>'+ lastNumber +'</th>' +
-        '<td>'+$("#name").val()+'</td>' +
-        '<td>'+$("#surname").val()+'</td>' +
-        '<td>'+$("#studentID").val()+'</td>' +
-        '<td class="d-none d-sm-block"><span class="btn btn-danger minus pull-center" id="minus">&ndash;</span></td>' +
-      '</tr>'
-      );
-      $("#name").val('');
-      $("#surname").val('');
-      $("#studentID").val('');
+  document.getElementById('addBtn').addEventListener("click", function(){
+    let lastNumber, rows = document.getElementsByTagName('tbody')[0].rows.length;
+    if(rows !== 0) lastNumber = rows;
+    else lastNumber = 0;
+    document.getElementsByTagName('tbody')[0].innerHTML +=
+      `<tr>
+        <th>`+ lastNumber +`</th> 
+        <td>`+document.getElementById('name').value     +`</td> 
+        <td>`+document.getElementById('surname').value  +`</td> 
+        <td>`+document.getElementById('studentID').value+`</td> 
+        <td class="d-none d-sm-block"><span class="btn btn-danger minus pull-center" id="minus"><i class="fas fa-trash-alt"></i></span></td> 
+      </tr>`;
+      document.getElementById('name').value = '';
+      document.getElementById('surname').value = '';
+      document.getElementById('studentID').value = '';
   });
-  
-  
-  
-  
+  /*
+  *     Table updating  
+   */
   function initTable(){
     clearTable();
     let table;
@@ -126,17 +153,16 @@
     tableRow.appendChild(document.createElement('td'));
     tableRow.appendChild(document.createElement('td'));
     table.forEach(function(item){
-      $('.table').append(
-      '<tr>' +
-        '<th>'+ lastNumber++ +'</th>' +
-        '<td>'+item.name+'</td>' +
-        '<td>'+item.surname+'</td>' +
-        '<td>'+item.studentID+'</td>' +
-        '<td class="d-none d-sm-block"><span class="btn btn-danger minus pull-center">&ndash;</span></td>' +
-      '</tr>'
-      );
+      document.getElementsByTagName('tbody')[0].innerHTML += 
+        `<tr>
+            <th>`+ lastNumber++ +`</th>
+            <td>`+item.name+`</td>
+            <td>`+item.surname+`</td>
+            <td>`+item.studentID+`</td>
+            <td class="d-none d-sm-block"><span class="btn btn-danger minus pull-center"><i class="fas fa-trash-alt"></i></span></td>
+          </tr>`;
     });
-    for(let tr of document.getElementsByTagName('tbody')[0].getElementsByTagName('tr')){
+    /*for(let tr of document.getElementsByTagName('tbody')[0].getElementsByTagName('tr')){
       let start;
       tr.addEventListener("touchstart", handleStart, false);
       tr.addEventListener("touchend", handleEnd, false);
@@ -146,7 +172,7 @@
       function handleEnd(evt) {
         if(new Date()-start > 500) $('#exampleModal').modal('toggle');
       };
-    }
+    }*/
     for(let td of document.getElementsByClassName('minus')){
       td.addEventListener('click', function(){
         if(this.parentElement.parentElement.parentElement.lastElementChild == this.parentElement.parentElement){
@@ -167,26 +193,36 @@
     };
   }
   document.getElementById('gNumInput').addEventListener("change",function(val){
-    if(groups.filter(item=>{return (item.gNum==val.target.value)}).length != 0){
+    if(groups.filter(item=>{return (item.gNum===val.target.value)}).length != 0){
       val.target.value='';
       //alert('Номер новой группы не может совпадать с номером уже существующей группы');
-      $('#exampleModal').modal('toggle');
+      $('#warningModal').modal('toggle');
     } 
   });
 
   function clearTable(){
-    document.getElementsByTagName('tbody')[0].innerHTML = ""
+    document.getElementsByTagName('tbody')[0].innerHTML = ''
   }
 
   function delRow(index){
-    $.get("/csrfToken", function (data, jwres) {
-      if (jwres != 'success') { return false; }
-      msg = {
-        index: index,
-        gNum:document.getElementById('gNum').selectedIndex,
-        _csrf: data._csrf
-      };
-      $.post("/groups/deleteElement", msg, function(data, status){});
-    });
+    fetch('/csrfToken')
+      .then(response => response.json())
+      .then(res => {
+        msg = {
+          data: 
+            {
+              index: index,
+              gNum:document.getElementById('gNum').selectedIndex,
+            },
+          _csrf: res._csrf
+        };
+        fetch('/groups/deleteElement',{
+          method:'POST',
+          body:JSON.stringify(msg),
+        })
+          .then(res => res.ok?'Ok':'Err')
+          .then(answer => console.log(answer))
+          .catch(res => console.log(response))
+      })
   }
 </script>
