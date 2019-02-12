@@ -127,10 +127,10 @@
     else lastNumber = 0;
     document.getElementsByTagName('tbody')[0].innerHTML +=
       `<tr>
-        <th>`+ lastNumber +`</th> 
-        <td>`+document.getElementById('name').value     +`</td> 
-        <td>`+document.getElementById('surname').value  +`</td> 
-        <td>`+document.getElementById('studentID').value+`</td> 
+        <th>${ lastNumber }</th> 
+        <td>${document.getElementById('name').value     }</td> 
+        <td>${document.getElementById('surname').value  }</td> 
+        <td>${document.getElementById('studentID').value}</td> 
         <td class="d-none d-sm-block"><span class="btn btn-danger minus pull-center" id="minus"><i class="fas fa-trash-alt"></i></span></td> 
       </tr>`;
       document.getElementById('name').value = '';
@@ -155,10 +155,10 @@
     table.forEach(function(item){
       document.getElementsByTagName('tbody')[0].innerHTML += 
         `<tr>
-            <th>`+ lastNumber++ +`</th>
-            <td>`+item.name+`</td>
-            <td>`+item.surname+`</td>
-            <td>`+item.studentID+`</td>
+            <th>${ lastNumber++}</th>
+            <td>${item.name}</td>
+            <td>${item.surname}</td>
+            <td>${item.studentID}</td>
             <td class="d-none d-sm-block"><span class="btn btn-danger minus pull-center"><i class="fas fa-trash-alt"></i></span></td>
           </tr>`;
     });

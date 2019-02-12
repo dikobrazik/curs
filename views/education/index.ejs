@@ -43,9 +43,11 @@
       let rowIndex;
       const week = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
       let tab = [];
+      let users;
       fetch('/user/list')
       .then(response => response.json())
       .then(data => {
+        users = data;
         data.forEach(item => {
           let option = document.createElement('option');
           option.innerHTML = item.name + ' ' + item.surname;
@@ -65,26 +67,13 @@
       /*
       *    Обработка кнопки SAVE модального окна
       */
-      $('.modal-save').click(function(){
-        let element = document.getElementsByTagName('table')[week.indexOf(cellIndex)].getElementsByTagName('tbody')[0].getElementsByTagName('td')[rowIndex-1];
-        let height = element.offsetHeight;
-        element.innerHTML = '<h4>'+document.getElementById('userSelect').value+'</h4>';
-        element.style.height = height + 'px';
+      document.getElementsByClassName('modal-save')[0].addEventListener("click",function(){
+        document
+            .getElementsByClassName('table')[cellIndex]
+            .getElementsByTagName('tr')[rowIndex]
+            .getElementsByTagName('td')[0].innerHTML = 
+            `<h4>${document.getElementById('userSelect').value}</h4>`;
         $('#exampleModal').modal('hide');
-        if(!tab[0]){
-          tab.length = 6;
-          for(let i = 0; i < 6; i++){
-            tab[i] = [];
-            tab[i].length = 6;
-          }
-        }
-        tab[week.indexOf(cellIndex)][rowIndex-1]={username:element.textContent};
-        update();
-      });
-      /*
-      *   UPDATE TABLE ROW
-      */
-      function update(){
         fetch('/csrfToken')
           .then(response => response.json())
           .then(res => {
@@ -92,7 +81,9 @@
               data: 
                 {
                   gNum:document.getElementById('groupSelect').value,
-                  content:JSON.stringify(tab),
+                  userId:users[document.getElementById('userSelect').selectedIndex].id,
+                  day:cellIndex,
+                  number:(rowIndex-1),
                 },
               _csrf: res._csrf
             };
@@ -104,15 +95,15 @@
               .then(answer => console.log(answer))
               .catch(res => console.log(response))
           })
-      }
+      });
       /*
       *    Обработка кнопки "+" некоторой таблицы
       */
       $(document).on('click', 'button[data-toggle="modal"]', function (event) {
         const button = $(event.target);
         //table name
-        cellIndex = button.parents('#table').find('thead tr th').text();
-        $('.modal-title').text(cellIndex);
+        cellIndex = week.indexOf(button.parents('#table').find('thead tr th').text());
+        $('.modal-title').text(week[cellIndex]);
         //row index
         rowIndex = button.parents('tr')["0"].rowIndex;
       });
@@ -139,44 +130,53 @@
           })
           .then(data => {
             tab = data;
-            data.forEach(function(item, i){
+            [null, null,null, null, null, null].forEach(function(item, i){
               let row = i<3?0:1;
               document.getElementsByClassName('row')[row].innerHTML = 
                 document.getElementsByClassName('row')[row].innerHTML + 
                 `<table class="table form-group col m-2" id="table">
                   <thead>
                     <tr>
-                      <th  class="float-center" scope="col">`+week[i]+`</th>
+                      <th  class="float-center" scope="col">${week[i]}</th>
                     </tr>
                   </thead>
-                  <tbody>`+tds(item)+`</tbody>
+                  <tbody>${tds(item)}</tbody>
                 </table>`;
             });
+            addData();
           })
           .catch(err=>{console.log(err)})
+      }
+      function addData(){
+        tab.map(item=>{
+          let user = users.filter(el=>el.id === item.userId)[0];
+          document
+            .getElementsByClassName('table')[item.day]
+            .getElementsByTagName('tr')[Number(item.number)+1]
+            .getElementsByTagName('td')[0].innerHTML = 
+            `<h4>${user.name} ${user.surname}</h4>`;
+        })
       }
       function tds(item){
         let tds = '';
         for(let i=0; i < 6; i++){
-          if(item){
-            if(item[i]) {
-              tds+=trsPattern(item[i].username);
-            }else tds+=trsPattern();
-          }else tds+=trsPattern();
+          if(item && item[i])
+            tds += 
+          `<tr class="d-flex justify-content-center">
+            <td class="col p-0" style="height: 39px;">
+              <h4>${item[i].username}</h4>
+            </td>
+          </tr>`
+          else
+            tds+=
+          `<tr class="d-flex justify-content-center ">
+            <td class="col p-0" style="height: 39px;">
+              <button name="plus" type="button" class="col btn btn-success" data-toggle="modal" onclick="plusPress(this)" data-target="#exampleModal">
+                <i class="fas fa-plus"></i>
+              </button>
+            </td>
+          </tr>`
         }
         return tds;
-      };
-      function tablePattern(){
-
-      };
-      function trsPattern(cont){
-        cont = typeof cont !== 'undefined' ?  '<h4>'+cont+'</h4>' : `<button name="plus" type="button" class="col btn btn-success" data-toggle="modal" onclick="plusPress(this)" data-target="#exampleModal">
-                <i class="fas fa-plus"></i>
-              </button>`;
-        return `<tr class="d-flex justify-content-center">
-            <td class="col p-0" style="height: 39px;">
-              `+cont+`
-            </td>
-          </tr>`;
       };
 </script>
