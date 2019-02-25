@@ -68,11 +68,6 @@
       *    Обработка кнопки SAVE модального окна
       */
       document.getElementsByClassName('modal-save')[0].addEventListener("click",function(){
-        document
-            .getElementsByClassName('table')[cellIndex]
-            .getElementsByTagName('tr')[rowIndex]
-            .getElementsByTagName('td')[0].innerHTML = 
-            `<h4>${document.getElementById('userSelect').value}</h4>`;
         $('#exampleModal').modal('hide');
         fetch('/csrfToken')
           .then(response => response.json())
@@ -91,9 +86,17 @@
               method:'POST',
               body:JSON.stringify(msg),
             })
-              .then(res => res.ok?'Ok':'Err')
-              .then(answer => console.log(answer))
-              .catch(res => console.log(response))
+              .then(res => {
+                if(res.status===200){
+                  document
+                    .getElementsByClassName('table')[cellIndex]
+                    .getElementsByTagName('tr')[rowIndex]
+                    .getElementsByTagName('td')[0].innerHTML = 
+                    `<h4>${document.getElementById('userSelect').value}</h4>`;
+                }
+              })
+              .then(res => alert("Один преподаватель не может преподавать нескольким группам в одно время"))
+              .catch(res => console.log(res))
           })
       });
       /*

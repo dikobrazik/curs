@@ -16,6 +16,10 @@ module.exports = {
       type: 'string',
       required: true
     },
+    date:{
+      type:'string',
+      required: true,
+    },
   },
 };
 

@@ -34,12 +34,32 @@ module.exports = {
             });
         });
     },
-    list: function(req,res){
-        Groups.find()
+    update: async function(req, res){
+        console.log(req.param('data'))
+        let updated = await Groups
+            .update({gNum:req.param('data').gNum})
+            .set({content:req.param('data').content})
+            .fetch();
+        console.log(updated)
+        return res.ok();
+    },
+    list: function(req, res){
+        if(req.param('index')){
+            Groups.find({gNum:req.param('index')})
+                .exec(function (err, groups) {
+                    if(req.param('day')){
+                        console.log(groups)
+                    }
+                    if (err) return res.send(500);
+                    return res.send(groups);
+                });
+        }else{
+            Groups.find()
             .exec(function (err, groups) {
-                return res.send(groups);
                 if (err) return res.send(500);
+                return res.send(groups);
             });
+        }
     },
 
     // @MAIN

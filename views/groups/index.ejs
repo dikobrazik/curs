@@ -31,6 +31,8 @@
 <script>
   var $ = jQuery.noConflict();
   var groups;
+  var surnames=['Смирнов', 'Иванов', 'Кузнецов', 'Соколов', 'Попов', 'Лебедев','Козлов', 'Новиков', 'Морозов', 'Петров', 'Волков', 'Соловьёв','Васильев', 'Зайцев', 'Павлов', 'Семёнов', 'Голубев', 'Виноградов','Богданов', 'Воробьёв', 'Фёдоров', 'Михайлов', 'Беляев', 'Тарасов', 'Белов']
+  var names = ['Александр', 'Алексей', 'Андрей', 'Артем', 'Виктор', 'Даниил', 'Дмитрий', 'Егор','Илья', 'Кирилл', 'Максим', 'Марк', 'Михаил', 'Роман', 'Степан', 'Тимофей', 'Ярослав']
   document.addEventListener("DOMContentLoaded", function(event) {
     // Обработка евентов
     document.getElementById('gNum').addEventListener('change', function(){
@@ -133,9 +135,38 @@
         <td>${document.getElementById('studentID').value}</td> 
         <td class="d-none d-sm-block"><span class="btn btn-danger minus pull-center" id="minus"><i class="fas fa-trash-alt"></i></span></td> 
       </tr>`;
-      document.getElementById('name').value = '';
-      document.getElementById('surname').value = '';
-      document.getElementById('studentID').value = '';
+    document.getElementById('name').value = '';
+    document.getElementById('surname').value = '';
+    document.getElementById('studentID').value = '';
+    if(document.getElementById('upgradeGroup').checked){
+      let content=[];
+      for(let tr of document.getElementsByTagName('tbody')[0].getElementsByTagName('tr')){
+        content.push({
+          name:tr.children[1].textContent,
+          surname:tr.children[2].textContent,
+          studentID:tr.children[3].textContent,
+        });
+      }
+      /*for(let i = 0 ; i < 20 ; i++){
+        content.push({
+          name:names[getRandomInt(0, names.length)],
+          surname:surnames[getRandomInt(0, surnames.length)],
+          studentID:getRandomInt(0,1000000)
+        })
+      }*/
+      fetch('/groups/update',{
+        method:'POST',
+        body:JSON.stringify({data: 
+            {
+              gNum:document.getElementById('gNum').value,
+              content:JSON.stringify(content)
+            }
+        }),
+      })
+      .then(res => res.ok?'Ok':'Err')
+      .then(answer => console.log(answer))
+      .catch(res => console.log(response))
+    }
   });
   /*
   *     Table updating  
@@ -162,17 +193,6 @@
             <td class="d-none d-sm-block"><span class="btn btn-danger minus pull-center"><i class="fas fa-trash-alt"></i></span></td>
           </tr>`;
     });
-    /*for(let tr of document.getElementsByTagName('tbody')[0].getElementsByTagName('tr')){
-      let start;
-      tr.addEventListener("touchstart", handleStart, false);
-      tr.addEventListener("touchend", handleEnd, false);
-      function handleStart(evt) {
-        start = new Date();
-      };
-      function handleEnd(evt) {
-        if(new Date()-start > 500) $('#exampleModal').modal('toggle');
-      };
-    }*/
     for(let td of document.getElementsByClassName('minus')){
       td.addEventListener('click', function(){
         if(this.parentElement.parentElement.parentElement.lastElementChild == this.parentElement.parentElement){
@@ -224,5 +244,8 @@
           .then(answer => console.log(answer))
           .catch(res => console.log(response))
       })
+  }
+  function getRandomInt(min, max){
+    return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 </script>

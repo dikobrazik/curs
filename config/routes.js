@@ -43,6 +43,17 @@ module.exports.routes = {
     action: 'destroy'
   },
   /*
+  *      /LESSONS/....
+  */
+  'post /lessons/update': {
+    controller: 'lesson',
+    action: 'update'
+  },
+  'get /lessons': {
+    controller: 'lesson',
+    action: 'list'
+  },
+  /*
   *      /EDUCATION/....
   */
   'post /edu/create': {
@@ -64,7 +75,7 @@ module.exports.routes = {
   /*
   *      /GROUPS/....
   */
-  'get /groups/list': {
+  'get /groups/list:index': {
     controller: 'groups',
     action: 'list'
   },
@@ -72,6 +83,11 @@ module.exports.routes = {
   'post /groups/create': {
     controller: 'groups',
     action: 'create'
+  },
+
+  'post /groups/update': {
+    controller: 'groups',
+    action: 'update'
   },
 
   'post /groups/deleteElement': {
