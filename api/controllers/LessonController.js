@@ -27,10 +27,20 @@ module.exports = {
         })
         if(upd) return res.sendStatus(200)
         return res.ok()
-    },
+    }, 
     list: async function(req,res){
-        let lessons = await Lesson.find()
-        return res.send(lessons)
+        console.log(req.allParams())
+        if(req.param('userId')){
+            let subjects = await Subject.find({userId:req.param('userId')})
+            let lessons = await Promise.all(subjects.map(async(value) => {let les = await Lesson.find({subjId:value.id});console.log(les);return les}))
+            console.log(subjects)
+            console.log(lessons)
+            lessons = lessons.flat(1)
+            return res.send(lessons)
+        }else{
+            let lessons = await Lesson.find()
+            return res.send(lessons)
+        }
     },
 };
 
