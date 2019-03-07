@@ -32,14 +32,23 @@ module.exports = {
         console.log(req.allParams())
         if(req.param('userId')){
             let subjects = await Subject.find({userId:req.param('userId')})
-            let lessons = await Promise.all(subjects.map(async(value) => {let les = await Lesson.find({subjId:value.id});console.log(les);return les}))
-            console.log(subjects)
-            console.log(lessons)
-            lessons = lessons.flat(1)
-            return res.send(lessons)
+            let lessons = await Promise.all(
+                subjects.map(async(value) => {
+                    let cri = {subjId:value.id}
+                    if(req.param('date')) cri.date = req.param('date')
+                    let les = await Lesson.find(cri)
+                    return les
+                })
+            )
+            return res.send(flatten(lessons))
         }else{
             let lessons = await Lesson.find()
             return res.send(lessons)
+        }
+        function flatten(arr) {
+            return arr.reduce(function (flat, toFlatten) {
+              return flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten);
+            }, []);
         }
     },
 };
