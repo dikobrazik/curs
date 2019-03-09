@@ -13,7 +13,7 @@ module.exports = {
       required: true
     },
     content: {
-      type: 'string',
+      type: 'json',
       required: true
     },
     date:{

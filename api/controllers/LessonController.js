@@ -14,7 +14,7 @@ module.exports = {
         }, {
             subjId:data.subjId,
             date:data.date,
-            content:JSON.stringify(data.content),
+            content:data.content,
         }).exec(function(err, record, wasCreated){
             if(err) return res.sendStatus(500)
             if(wasCreated) return res.sendStatus(200)
