@@ -91,6 +91,15 @@ module.exports = {
         });*/
             
     },
+    info: function(req, res){
+        User.find(
+            {id: req.param('userId')}
+        )
+        .exec(function (err, users) {
+            return res.send(users);
+            if (err) return res.send(500);
+        });
+    },
     // @MAIN
     index: function (req, res) {
         res.view();

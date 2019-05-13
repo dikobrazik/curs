@@ -23,6 +23,11 @@ module.exports = {
         type:'string',
         required:true,
     },
+    // Subject name
+    name:{
+      type:'string',
+      required:true,
+    },  
     // Day of the week
     number:{
         type:'string',

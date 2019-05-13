@@ -19,9 +19,12 @@
             </button>
           </div>
           <div class="modal-body">
-            <select class="form-control" id="userSelect">
+              <label for="userSelect">Выборите преподавателя..</label>
+              <select class="form-control" id="userSelect">
               
-            </select>
+              </select>
+              <label for="name">Введите наименование предмета..</label>
+              <input type="text" class="form-control" id="name" placeholder="Математика">
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -68,6 +71,10 @@
       *    Обработка кнопки SAVE модального окна
       */
       document.getElementsByClassName('modal-save')[0].addEventListener("click",function(){
+        if(document.getElementById('name').value == ''){       
+          alert('Заполните все поля!')
+          return;
+        }
         $('#exampleModal').modal('hide');
         fetch('/csrfToken')
           .then(response => response.json())
@@ -79,6 +86,7 @@
                   userId:users[document.getElementById('userSelect').selectedIndex].id,
                   day:cellIndex,
                   number:(rowIndex-1),
+                  name:document.getElementById('name').value,
                 },
               _csrf: res._csrf
             };
@@ -94,8 +102,9 @@
                     .getElementsByTagName('td')[0].innerHTML = 
                     `<h4>${document.getElementById('userSelect').value}</h4>`;
                 }
+                return res;
               })
-              .then(res => alert("Один преподаватель не может преподавать нескольким группам в одно время"))
+              .then(res => {if(res.status===208) alert("Один преподаватель не может преподавать нескольким группам в одно время")})
               .catch(res => console.log(res))
           })
       });

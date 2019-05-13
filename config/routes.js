@@ -114,6 +114,10 @@ module.exports.routes = {
     controller: 'user',
     action: 'list'
   },
+  'get /user/info': {
+    controller: 'user',
+    action: 'info'
+  },
   
   /***************************************************************************
   *                                                                          *

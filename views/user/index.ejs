@@ -83,7 +83,7 @@
       /*
       * Отправляет данные на сервер
       */
-      $(document).on('click', '.submit', function(){
+      document.getElementsByClassName('submit')[0].addEventListener("click" , function(){
         $.get("/csrfToken", function (data, jwres) {
             if (jwres != 'success') { return false; }
             msg = {
@@ -110,24 +110,33 @@
             });
         });
       });
-      $('.plus').click(function(){
-         $.get("/csrfToken", function (data, jwres) {
-            if (jwres != 'success') { return false; }
+      document.getElementById('add').addEventListener("click", function(){
+        fetch('/csrfToken')
+          .then(response => response.json())
+          .then(res => {
             msg = {
               data: 
-                {name:$('#name').val(),
-                surname:$('#surname').val(),
-                username:$('#username').val(),
-                password:$('#password').val()},
-              _csrf: data._csrf
+                {
+                  name:document.getElementById('name').value,
+                  surname:document.getElementById('surname').value,
+                  username:document.getElementById('username').value,
+                  password:document.getElementById('password').value,
+                },
+              _csrf: res._csrf
             };
-            $.post("/user/create", msg, function(data, status){
-                if(data == 'Short password.'){
+            fetch('/user/create',{
+              method:'POST',
+              body:JSON.stringify(msg),
+            })
+              .then(res => {
+                if(res.data == 'Short password.'){
                     alert('Длина пароля должна быть минимум 5 символов');
                 }else{
                   refresh();
                 }
-            });
-          });
+              })
+              .catch(res => console.log(res))
+          })
       });
+      
 </script>

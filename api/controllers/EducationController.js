@@ -13,13 +13,14 @@ module.exports = {
             day:data.day,
             number:data.number,
         });
-        console.log(subj)
-        if(!subj){
+        // console.log(subj)
+        if(!subj || subj.length==0){
             Subject.create({
                 gNum:data.gNum,
                 userId:data.userId,
                 day:data.day,
                 number:data.number,
+                name:data.name
             }).exec((err)=>{
                 if(err) return res.sendStatus(500)
                 return res.sendStatus(200)
